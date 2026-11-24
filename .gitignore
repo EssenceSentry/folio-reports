@@ -1,0 +1,21 @@
+# Environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.complexipy_cache/
+.import_linter_cache/
+
+# Build and report output
+build/
+dist/
+docs/_build/
+.coverage
+.coverage.*
+coverage.json
+coverage.xml
+htmlcov/
+
+.DS_Store

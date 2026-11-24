@@ -1,0 +1,9 @@
+% Compact headings, short measure and a sans-serif headline for a decision.
+\definecolor{FolioAccent}{HTML}{00645D}
+\newcommand{\FolioKind}{Decision brief}
+\renewcommand{\maketitle}{%
+  \FolioMasthead\vspace{4pt}%
+  {\sffamily\bfseries\fontsize{31}{34}\selectfont\raggedright\hyphenpenalty=10000\FolioTitle\par}%
+  \vspace{3pt}\FolioDeck\FolioByline\vspace{3pt}}
+\titleformat{\section}{\sffamily\bfseries\large\color{FolioAccent}}{\thesection}{.65em}{}
+\titlespacing*{\section}{0pt}{12pt}{1pt}

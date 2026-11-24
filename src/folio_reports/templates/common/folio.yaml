@@ -1,0 +1,23 @@
+from: markdown
+to: latex
+standalone: true
+pdf-engine: tectonic
+citeproc: true
+filters:
+  - blocks.lua
+include-in-header:
+  - style.tex
+  - layout.tex
+variables:
+  documentclass: article
+  papersize: a4
+  fontsize: 11pt
+  geometry:
+    - left=28mm
+    - right=28mm
+    - top=23mm
+    - bottom=27mm
+    - footskip=13mm
+  colorlinks: true
+  urlcolor: teal
+  linkcolor: black

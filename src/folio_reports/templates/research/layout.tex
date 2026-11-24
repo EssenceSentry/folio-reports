@@ -1,0 +1,12 @@
+% Display serif, numbered sections and a warm accent for extended reading.
+\definecolor{FolioAccent}{HTML}{8C492F}
+\newcommand{\FolioKind}{Research report}
+\renewcommand{\maketitle}{%
+  \FolioMasthead\vspace{7pt}%
+  {\fontsize{38}{40}\selectfont\raggedright\hyphenpenalty=10000\FolioTitle\par}%
+  \vspace{4pt}\FolioDeck\FolioByline\vspace{6pt}%
+  {\color{FolioRule}\hrule height .5pt}\vspace{4pt}}
+\setcounter{secnumdepth}{1}
+\titleformat{\section}{\Large\bfseries\color{FolioInk}}%
+  {\small\sffamily\bfseries\color{FolioAccent}\thesection}{.8em}{}
+\titlespacing*{\section}{0pt}{15pt}{4pt}

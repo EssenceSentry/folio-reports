@@ -1,0 +1,16 @@
+# Written by Copier; `copier update` reads it to apply template changes.
+_commit: v0.1.0
+_src_path: /Users/agustinsellanes/Repos/lathe
+author_email: 49651745+EssenceSentry@users.noreply.github.com
+author_name: Agustín Sellanes
+description: Typeset decision briefs and research reports from Markdown.
+distribution_name: folio-reports
+docs_site: false
+github_owner: EssenceSentry
+license: proprietary
+package_name: folio_reports
+project_name: Folio Reports
+python_min: '3.12'
+shape: cli
+versioning: snapshot
+visibility: private

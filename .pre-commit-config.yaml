@@ -1,0 +1,91 @@
+# Every quality gate is a hook here. CI runs these same hooks, so local checks
+# and CI cannot drift apart. Commit hooks are fast; tests and the docs build
+# run before a push.
+default_install_hook_types: [pre-commit, pre-push, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: uv-lock
+        name: uv.lock matches pyproject.toml
+        entry: uv lock --check
+        language: system
+        files: ^(pyproject\.toml|uv\.lock)$
+        pass_filenames: false
+
+      - id: ruff-check
+        name: ruff lint
+        entry: uv run --no-sync ruff check --fix
+        language: system
+        types_or: [python, pyi]
+
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --no-sync ruff format
+        language: system
+        types_or: [python, pyi]
+
+      - id: basedpyright
+        name: type check (strict in src)
+        entry: uv run --no-sync basedpyright
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false
+
+      - id: complexipy
+        name: cognitive complexity at most 15
+        entry: uv run --no-sync complexipy src --max-complexity-allowed 15
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: import-linter
+        name: import boundaries
+        entry: uv run --no-sync lint-imports
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: zizmor
+        name: workflow security
+        entry: uv run --no-sync zizmor .github/workflows
+        language: system
+        files: ^\.github/
+        pass_filenames: false
+
+      - id: no-ai-coauthors
+        name: no AI co-author trailers
+        entry: uv run --no-sync python scripts/check_no_ai_coauthors.py
+        language: system
+        stages: [commit-msg]
+
+      - id: tests
+        name: tests with 90% branch coverage
+        entry: uv run --no-sync pytest -q
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+
+      - id: docs
+        name: docs build without warnings
+        entry: uv run --no-sync sphinx-build -W -n --keep-going -q -b html docs docs/_build/html
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

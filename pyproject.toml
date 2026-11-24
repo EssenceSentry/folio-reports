@@ -1,0 +1,148 @@
+[build-system]
+requires = ["hatchling>=1.27", "hatch-vcs>=0.5"]
+build-backend = "hatchling.build"
+
+[project]
+name = "folio-reports"
+dynamic = ["version"]
+description = "Typeset decision briefs and research reports from Markdown."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "LicenseRef-Proprietary"
+license-files = ["LICENSE"]
+authors = [{ name = "Agustín Sellanes", email = "49651745+EssenceSentry@users.noreply.github.com" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+    # PyPI refuses any upload carrying this classifier.
+    "Private :: Do Not Upload",
+]
+dependencies = []
+
+[project.scripts]
+folio-reports = "folio_reports.cli:main"
+
+[project.urls]
+Repository = "https://github.com/EssenceSentry/folio-reports"
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.40",
+    "complexipy>=8",
+    "hypothesis>=6",
+    "import-linter>=2",
+    "pip-audit>=2.10",
+    "pre-commit>=4",
+    "pytest>=9",
+    "pytest-cov>=7",
+    "ruff>=0.17",
+    "zizmor>=1.31",
+]
+docs = [
+    "myst-parser>=5",
+    "pydata-sphinx-theme>=0.23",
+    "sphinx>=9",
+    "sphinx-copybutton>=0.5",
+]
+
+[tool.uv]
+default-groups = ["dev", "docs"]
+# Rebuild the package when the commit or tags change, so its version stays current.
+cache-keys = [{ file = "pyproject.toml" }, { git = { commit = true, tags = true } }]
+
+# Versions come from git. Without a tag the version is 0.0.1.devN+g<sha>, where
+# N counts commits; tags set release versions. The fallback covers a fresh
+# repository before its first commit.
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+fallback_version = "0.0.0"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/folio_reports"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+extend-exclude = ["docs/_build"]
+
+[tool.ruff.lint]
+select = [
+    "B",    # likely bugs
+    "C4",   # comprehensions
+    "D",    # docstrings on public API
+    "E",    # pycodestyle errors
+    "ERA",  # commented-out code
+    "F",    # pyflakes
+    "I",    # import order
+    "N",    # naming
+    "PERF", # performance
+    "PLE",  # pylint errors
+    "PLW",  # pylint warnings
+    "PT",   # pytest style
+    "RUF",  # ruff-specific
+    "S",    # security
+    "SIM",  # simplifications
+    "UP",   # modern syntax
+    "W",    # pycodestyle warnings
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D", "S101"]
+"docs/conf.py" = ["D100"]
+"scripts/**" = ["S603", "S607"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+# basedpyright reads this section too. Library code is strict; tests, scripts
+# and docs get standard checking.
+[tool.pyright]
+include = ["src", "tests", "scripts", "docs"]
+exclude = ["docs/_build", "**/.venv"]
+pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "standard"
+strict = ["src"]
+reportUnnecessaryTypeIgnoreComment = "error"
+
+[tool.pytest.ini_options]
+minversion = "9"
+testpaths = ["tests"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra",
+    "--cov=folio_reports",
+    "--cov-report=term-missing",
+]
+xfail_strict = true
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+fail_under = 90
+skip_covered = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    'if __name__ == "__main__":',
+    "raise NotImplementedError",
+]
+
+[tool.importlinter]
+root_package = "folio_reports"
+
+[[tool.importlinter.contracts]]
+name = "Core logic does not depend on its interfaces"
+type = "forbidden"
+source_modules = ["folio_reports.core"]
+forbidden_modules = [
+    "folio_reports.cli",
+]
