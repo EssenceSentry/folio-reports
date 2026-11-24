@@ -10,15 +10,15 @@ from tempfile import TemporaryDirectory
 
 LAYOUTS = ("brief", "research", "specimen")
 STYLES = {
-    "classic": "Original Folio typography tailored to each starter.",
-    "swiss": "Asymmetric grotesk headlines and a strong red rule.",
+    "classic": "An editorial journal with Garamond display type and Source Serif text.",
+    "swiss": "A two-column opening with condensed IBM Plex and flush-left text.",
     "gazette": "A centered newspaper masthead and double rules.",
     "blueprint": "Cobalt drafting marks and monospaced annotations.",
     "fieldnotes": "Olive field-journal typography and an inset title.",
     "ledger": "A compact financial statement with ruled section labels.",
     "gallery": "Aubergine exhibition typography with generous open space.",
     "signal": "A high-contrast banner for operational decisions.",
-    "monograph": "Quiet book typography, centered titles and small capitals.",
+    "monograph": "A centered Garamond book opening, small capitals and indented prose.",
     "dispatch": "A navy correspondence header and a split title block.",
 }
 _TEMPLATES = Path(__file__).with_name("templates")

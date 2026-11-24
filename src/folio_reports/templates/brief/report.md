@@ -17,11 +17,15 @@ Across four morning departures, 60 of 400 observed connections failed. The 08:10
 
 # Give the pilot a fair test
 
-| Decision | Pilot design |
+::: {.table-layout widths="1,4"}
+
+| **Decision** | **Pilot design** |
 |:-------------|:-------------------------------------------------------|
 | Owner | The morning dispatcher records each hold and its duration. |
 | Comparison | Alternate hold and usual-service days. Give every weekday one of each over two weeks. |
 | Measures | Count successful transfers and passenger-minutes of delay at the following stop. |
+
+:::
 
 # What would justify keeping it?
 

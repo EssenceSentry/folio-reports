@@ -1,10 +1,11 @@
 % Signal | reversed title panel and high-contrast headings.
 \definecolor{FolioAccent}{HTML}{124B59}
+\newfontfamily\FolioSignalDisplay{IBMPlexSansCondensed-SemiBold.otf}
 \renewcommand{\maketitle}{%
   \begingroup\setlength{\fboxsep}{11pt}\noindent
   \colorbox{FolioAccent}{\begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}
     \color{white}\FolioLabel{\MakeUppercase{\FolioKind}}\par\vspace{7pt}
-    \FolioHeadline{\sffamily\bfseries}{30}{32}
+    \FolioHeadline{\FolioSignalDisplay}{39}{41}
     {\sffamily\FolioSubtitle\par}
   \end{minipage}}\par\endgroup\vspace{4pt}\FolioByline}
 \FolioHeadings{\sffamily\bfseries\large}{FolioAccent}

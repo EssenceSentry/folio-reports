@@ -1,10 +1,11 @@
 % Gazette | centered serif title with the rules of a newspaper.
 \definecolor{FolioAccent}{HTML}{6F303C}
 \FolioSerif{termes}
+\newfontfamily\FolioGazetteDisplay{PlayfairDisplay-Bold.otf}[Scale=1]
 \renewcommand{\maketitle}{%
   {\centering\FolioEyebrow\par}\vspace{3pt}
   \hrule height .8pt\vspace{1.5pt}\hrule height .35pt\vspace{10pt}
-  {\bfseries\fontsize{35}{37}\selectfont\FolioTitleCentered\FolioTitle\par}
+  {\FolioGazetteDisplay\fontsize{37}{39}\selectfont\FolioTitleCentered\FolioTitle\par}
   \vspace{4pt}{\centering\large\itshape\FolioTitleCentered\FolioSubtitle\par}
-  \vspace{5pt}{\centering\FolioByline}\vspace{6pt}\hrule height .6pt}
+  \vspace{5pt}{\centering\FolioByline}\vspace{6pt}\hrule height .6pt\vspace{7pt}}
 \FolioHeadings{\rmfamily\bfseries\Large}{FolioInk}

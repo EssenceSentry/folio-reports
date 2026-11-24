@@ -1,9 +1,10 @@
 % Blueprint | a drawing title block with registration marks and a ruled legend.
 \definecolor{FolioAccent}{HTML}{204D89}
+\newfontfamily\FolioDraftDisplay{IBMPlexSansCondensed-Medium.otf}
 \renewcommand{\maketitle}{%
   {\color{FolioAccent}\ttfamily\small +\enspace\MakeUppercase{\FolioKind}\hfill +\par}
   {\color{FolioAccent}\hrule height .5pt}\vspace{9pt}
-  \FolioHeadline{\sffamily\mdseries}{34}{37}\vspace{4pt}
+  \FolioHeadline{\FolioDraftDisplay}{37}{39}\vspace{4pt}
   \FolioDeck\vspace{3pt}
   {\color{FolioRule}\hrule height .4pt}\vspace{4pt}
   {\ttfamily\small\color{FolioAccent}\FolioBylineInline\par}

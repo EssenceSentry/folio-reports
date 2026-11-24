@@ -23,7 +23,9 @@ The pattern suggests a targeted dispatch trial. A permanent timetable change nee
 
 Of the 29 missed connections at 08:10, 18 riders reached the stop within 90 seconds after departure. Across all four groups, recovering every one of those 18 transfers would move the miss rate from 15% to 10.5%. This is an upper bound. A driver may already have left the bay, and a delayed connector may cost riders a downstream transfer.
 
-| Departure | Observed riders | Missed | Arrived within 90 s¹ |
+::: {.table-layout widths="19,25,18,38" width="87.5%"}
+
+| **Departure** | **Observed riders** | **Missed** | **Arrived within 90 s¹** |
 |:----------|----------------:|-------:|-----------------------:|
 | 07:10     |             100 |      8 |                      3 |
 | 07:40     |             100 |     12 |                      5 |
@@ -32,6 +34,7 @@ Of the 29 missed connections at 08:10, 18 riders reached the stop within 90 seco
 | **Total** |         **400** | **60** |                 **30** |
 
 ¹ Riders who reached the bay after the connector left, but within 90 seconds of departure. The denominator for the miss rate includes everyone attempting to transfer.
+:::
 
 # What the intervals capture
 

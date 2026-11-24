@@ -45,9 +45,15 @@ For a short metric with a unit or percentage, use a fenced block. The text on th
 
 Use a top-level heading for each section. All three layouts paginate automatically. The research example uses a deliberate `\newpage` before its methods. Delete that line for continuous flow. For a longer study, add `table-of-contents: true` to `folio.yaml`. Set `papersize: letter` under `variables` for US Letter.
 
+## Proof the page at reading size
+
+Start with an interior page that contains two paragraphs, a heading and a table. Read a paragraph at actual size. If you lose your place on the return to the left edge, try a shorter line before increasing the type. Change one of the font, size, line spacing or measure at a time and compare the same paragraph in both proofs. [Butterick’s body-text guidance](https://practicaltypography.com/body-text.html).
+
+For tables, try following one number up to its column label, then reading across to its row label. Adjust the column widths until both are easy. Set an explanatory note within the same measure. The component guide shows how to control both widths from Markdown. [Tables and their notes](components.md#tables-and-their-notes).
+
 ## Edit the design or hand off the source
 
-The starters share `style.tex` for body typography, table spacing, captions, and footers. `layout.tex` controls the accent, title and section styles. Both files are copied into each new report. The included TeX Gyre Pagella and Heros font settings resolve from the TeX distribution.
+The starters share `style.tex` for body typography, table spacing, captions, and footers. `layout.tex` controls the accent, title and section styles. Both files are copied into each new report. The default pairs EB Garamond display type with Source Serif Pro for prose and Source Sans Pro for captions and tables. Swiss uses IBM Plex Sans. Monograph uses EB Garamond for continuous reading. The font files resolve from the TeX distribution.
 
 ```sh
 folio-reports build transfer-study -o transfer-study/manuscript.tex

@@ -1,14 +1,22 @@
-% Monograph | book typography and a small ornament on the center axis.
-\definecolor{FolioAccent}{HTML}{594B41}
-\FolioSerif{schola}
+% Monograph | a book opening in Garamond, with an italic deck and an open foot.
+\definecolor{FolioAccent}{HTML}{63503E}
+\setmainfont{EBGaramond-Regular.otf}[ItalicFont=EBGaramond-Italic.otf,
+  BoldFont=EBGaramond-SemiBold.otf,BoldItalicFont=EBGaramond-SemiBoldItalic.otf,
+  Scale=1.08,Numbers=OldStyle]
+\renewcommand{\FolioTableFace}{\rmfamily}
+\renewcommand{\FolioMetricFace}{\rmfamily\addfontfeatures{Numbers=Lining}}
+\makeatletter
 \renewcommand{\maketitle}{%
-  \begin{center}
-  {\small\scshape\FolioKind}\par\vspace{7pt}
-  {\fontsize{32}{36}\selectfont\FolioTitleCentered\FolioTitle\par}
-  \vspace{3pt}{\large\itshape\FolioTitleCentered\FolioSubtitle\par}
-  \vspace{5pt}\FolioByline\vspace{3pt}
-  {\color{FolioAccent}\rule{14mm}{.5pt}}
-  \end{center}}
-\FolioHeadings{\rmfamily\mdseries\Large}{FolioInk}
-\renewcommand{\footrulewidth}{0pt}
+  \begingroup\centering
+  {\fontsize{10}{13}\selectfont\scshape\addfontfeatures{LetterSpace=8}%
+    \MakeLowercase{\FolioKind}\par}\vspace{13pt}%
+  {\fontsize{47}{47}\selectfont\FolioTitleCentered\FolioTitle\par}\vspace{5pt}%
+  {\itshape\fontsize{15}{18}\selectfont\FolioTitleCentered\FolioSubtitle\par}%
+  \vspace{8pt}{\small\FolioBylineInline\par}%
+  \endgroup\vspace{12pt}\par\@afterindentfalse\@afterheading}
+\makeatother
+\titleformat{\section}{\rmfamily\mdseries\fontsize{20}{23}\selectfont}%
+  {\itshape\thesection}{.6em}{\raggedright}
+\titlespacing*{\section}{0pt}{15pt}{3pt}
+\AtBeginDocument{\setlength{\parindent}{1.25em}\setlength{\parskip}{0pt}}
 \fancyfoot[L]{}\fancyfoot[R]{}\fancyfoot[C]{\small\rmfamily\thepage}

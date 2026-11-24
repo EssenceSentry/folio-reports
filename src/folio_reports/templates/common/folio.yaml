@@ -12,11 +12,11 @@ variables:
   papersize: a4
   fontsize: 11pt
   geometry:
-    - left=28mm
-    - right=28mm
+    - left=31mm
+    - right=38mm
     - top=23mm
     - bottom=27mm
     - footskip=13mm
   colorlinks: true
-  urlcolor: teal
+  urlcolor: FolioAccent
   linkcolor: black

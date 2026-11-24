@@ -21,7 +21,8 @@ def masthead_end(page) -> float:
     positions = []
 
     def locate(text, matrix, text_matrix, _font, size):
-        if "A late feeder bus" in text:
+        # PDF writers may position glyphs without explicit space characters.
+        if "Alatefeederbus" in "".join(text.split()):
             baseline = matrix[5] + text_matrix[5]
             height = float(page.mediabox.height)
             positions.append((height - baseline - size) / height)
@@ -54,19 +55,8 @@ def raster_page(pdf: Path, page: int, destination: Path) -> Image.Image:
         return image.convert("RGB")
 
 
-def render_examples(root: Path, assets: Path) -> None:
-    """Build each worked report and place the brief and research pages side by side."""
-    pages = []
-    for layout, filename in (
-        ("brief", "decision-brief"),
-        ("research", "research-report"),
-    ):
-        project = new(layout, root / layout)
-        pdf = build(project, assets / f"{filename}.pdf")
-        for number in range(1, len(PdfReader(pdf).pages) + 1):
-            page = raster_page(pdf, number, project / f"page-{number}")
-            page.thumbnail((420, 595), Image.Resampling.LANCZOS)
-            pages.append(page)
+def page_spread(pages: list[Image.Image], destination: Path) -> None:
+    """Put complete pages on one neutral ground at their true relative scale."""
     gutter = 26
     sheet = Image.new(
         "RGB",
@@ -80,7 +70,23 @@ def render_examples(root: Path, assets: Path) -> None:
     for page in pages:
         sheet.paste(page, (x, gutter))
         x += page.width + gutter
-    sheet.save(assets / "report-previews.webp", quality=92, method=6)
+    sheet.save(destination, quality=92, method=6)
+
+
+def render_examples(root: Path, assets: Path) -> None:
+    """Build each worked report and place the brief and research pages side by side."""
+    pages = []
+    for layout, filename in (
+        ("brief", "decision-brief"),
+        ("research", "research-report"),
+    ):
+        project = new(layout, root / layout)
+        pdf = build(project, assets / f"{filename}.pdf")
+        for number in range(1, len(PdfReader(pdf).pages) + 1):
+            page = raster_page(pdf, number, project / f"page-{number}")
+            page.thumbnail((420, 595), Image.Resampling.LANCZOS)
+            pages.append(page)
+    page_spread(pages, assets / "report-previews.webp")
     build(
         new("specimen", root / "specimen", style="fieldnotes"),
         assets / "component-specimen.pdf",
@@ -89,6 +95,7 @@ def render_examples(root: Path, assets: Path) -> None:
 
 def render_styles(root: Path, assets: Path) -> None:
     """Compile the style lookbook and crop each masthead from its actual PDF."""
+    comparison = {}
     gallery = PdfWriter()
     gallery.add_metadata({"/Title": "Folio Reports · Ten visual styles"})
     sheet = Image.new("RGB", (1040, 5 * 230 + 20), "#ECEBE6")
@@ -108,6 +115,10 @@ def render_styles(root: Path, assets: Path) -> None:
             raise ValueError(f"{style} proof no longer fits on one page")
         gallery.append(pdf, outline_item=style.title(), import_outline=False)
         with raster_page(pdf, 1, project / "thumbnail") as page:
+            if style in {"classic", "swiss", "monograph"}:
+                full_page = page.copy()
+                full_page.thumbnail((540, 765), Image.Resampling.LANCZOS)
+                comparison[style] = full_page
             width, height = page.size
             header = page.crop(
                 (
@@ -122,6 +133,10 @@ def render_styles(root: Path, assets: Path) -> None:
             drawing.rounded_rectangle((x, y, x + 494, y + 216), radius=5, fill="white")
             sheet.paste(header, (x + (494 - header.width) // 2, y + 45))
             drawing.text((x + 20, y + 10), style.title(), fill="#303C3D", font=font)
+    page_spread(
+        [comparison[style] for style in ("classic", "swiss", "monograph")],
+        assets / "typography-comparison.webp",
+    )
     gallery.write(assets / "style-lookbook.pdf")
     sheet.save(assets / "style-previews.webp", quality=91, method=6)
 

@@ -10,7 +10,7 @@ Write the finding in Markdown. Give the person reading it a PDF they can take in
 
 | If your reader needs to… | Start with |
 |---|---|
-| Approve a change, understand its size, and know who acts next | **Brief.** A compact sans-serif headline, a prominent metric, and a short action table. |
+| Approve a change, understand its size, and know who acts next | **Brief.** An editorial headline, a prominent metric, and a short action table. |
 | Inspect a result, follow the method, and judge its limits | **Research.** Numbered sections, vector figures, equations, and a bibliography. |
 | Find a component and copy a working example | **Specimen.** A six-page pilot report with scorecards, charts, a comparison, a workflow, methods, and an appendix. |
 
@@ -30,7 +30,11 @@ Open `my-brief/report.pdf` for a proof of the title and byline. Write below the 
 
 ## Choose a visual style
 
-Compare the ten treatments on the same manuscript in the [style lookbook](examples/style-lookbook.pdf), or scan the [masthead gallery](examples/style-previews.webp).
+Read the same brief three ways. **Classic** uses a Garamond headline over Source Serif text. **Swiss** puts the byline in a left column and sets the body in IBM Plex Sans. **Monograph** centers its opening and uses Garamond, indented paragraphs and a quiet page number.
+
+![Classic, Swiss and Monograph, left to right, each typesetting the same complete decision brief.](examples/typography-comparison.webp)
+
+[All ten styles at reading size](examples/style-lookbook.pdf) · [Masthead gallery](examples/style-previews.webp)
 
 ```sh
 folio-reports styles

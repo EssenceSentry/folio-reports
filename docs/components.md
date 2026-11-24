@@ -25,6 +25,24 @@ Of 200 recorded visits, **72 began after 18:00**.
 :::
 ````
 
+## Tables and their notes
+
+Use an ordinary Markdown table for a small comparison at its natural width. Wrap it in `.table-layout` to choose its measure. The brief gives four parts of the width to the decision text for every one part given to its label. The research report groups its four columns and explanatory note within seven eighths of the reading column.
+
+````markdown
+::: {.table-layout widths="2,1,1" width="75%"}
+
+| **Departure** | **Observed** | **Missed** |
+|:--------------|-------------:|-----------:|
+| 07:10         |          100 |          8 |
+| 08:10         |          100 |         29 |
+
+Counts refer to riders attempting a transfer.
+:::
+````
+
+Give one positive weight per column. The optional `width` is a percentage of the available line, defaulting to 100%. Markdown controls the alignment of each column. A paragraph below the table becomes a smaller note with the same left and right boundaries. The native table can still carry a caption and continue across pages with repeated headers.
+
 ## Numbers, comparisons and charts
 
 | Block | Inputs and visual encoding |
@@ -104,4 +122,4 @@ Use attribute-only blocks for bars, intervals, trends, distribution plots and he
 
 ## Rebuild the visual catalog
 
-From the checkout, run `uv run --with-editable . --script examples/build_catalog.py`. The command builds the brief, research report and specimen, then typesets the same brief in all ten styles for the bookmarked lookbook. Both README previews come from those PDFs. The authoring CLI needs Pandoc and Tectonic. The catalog script also uses Poppler's `pdftoppm` and installs its own Python image and PDF dependencies through uv.
+From the checkout, run `uv run --with-editable . --script examples/build_catalog.py`. The command builds the brief, research report and specimen, then typesets the same brief in all ten styles for the bookmarked lookbook. The page spreads and masthead preview come from those PDFs. The authoring CLI needs Pandoc and Tectonic. The catalog script also uses Poppler's `pdftoppm` and installs its own Python image and PDF dependencies through uv.

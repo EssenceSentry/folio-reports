@@ -12,8 +12,22 @@
   \ifx\@date\@empty\else\ifx\@author\@empty\else\enspace/\enspace\fi\@date\fi}}
 \makeatother
 \newcommand{\FolioHeadings}[2]{%
-  \titleformat{\section}{#1\color{#2}}{\thesection}{.65em}{}
+  \titleformat{\section}{#1\color{#2}}{\thesection}{.65em}{\FolioTitleRaggedRight}
   \titlespacing*{\section}{0pt}{12pt}{3pt}}
+% Native Markdown longtables keep their notes and numbers on the same grid.
+\newcommand{\FolioTableFace}{\sffamily}
+\newenvironment{FolioTable}[1]{\par\addvspace{6pt}\begingroup
+  \setlength{\linewidth}{#1\linewidth}\setlength{\columnwidth}{\linewidth}%
+  \setlength{\hsize}{\linewidth}\setlength{\LTleft}{0pt}\setlength{\LTright}{\fill}%
+  \FolioTableFace\fontsize{10.5}{13}\selectfont\addfontfeatures{Numbers={Lining,Monospaced}}%
+  \renewcommand{\arraystretch}{1.22}%
+  \setlength{\LTpre}{5pt}\setlength{\LTpost}{2pt}%
+  \setlength{\heavyrulewidth}{.55pt}\setlength{\lightrulewidth}{.3pt}%
+  \setlength{\aboverulesep}{2pt}\setlength{\belowrulesep}{2pt}%
+}{\par\endgroup}
+\newenvironment{FolioTableNote}{\par\begingroup
+  \sffamily\footnotesize\color{FolioMuted}\RaggedRight\setlength{\parskip}{0pt}%
+  \noindent\ignorespaces}{\par\endgroup}
 % Long callouts break with the page. A short label stays with its first line.
 \tcbset{folio base/.style={enhanced,breakable,frame hidden,sharp corners,
   boxrule=0pt,left=9pt,right=9pt,top=5pt,bottom=5pt,

@@ -63,12 +63,16 @@ Of 200 visits, 80 began before 17:00, 48 between 17:00 and 18:00, and 72 after 1
 ::: {.trend label="Evening visits per week" min="0" max="30" start="Week 1" end="Week 4" values="12,16,20,24"}
 :::
 
-| Week | All visits | Evening visits | Evening share |
+::: {.table-layout widths="22,25,27,26" width="80%"}
+
+| **Week** | **All visits** | **Evening visits** | **Evening share** |
 |:-----|-----------:|---------------:|--------------:|
 | 1    | 50         | 12             | 24%           |
 | 2    | 50         | 16             | 32%           |
 | 3    | 50         | 20             | 40%           |
 | 4    | 50         | 24             | 48%           |
+
+:::
 
 ::: {.source}
 Evening arrivals doubled from 12 to 24 while total weekly visits held at 50. The appendix compares the weekly shares and their uncertainty.

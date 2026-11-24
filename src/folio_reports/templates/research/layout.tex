@@ -1,13 +1,9 @@
-% A reading spread with a display serif and section locators in the margin.
-\definecolor{FolioAccent}{HTML}{8C492F}
+% Journal typography for a research report.
+\definecolor{FolioAccent}{HTML}{80422F}
 \newcommand{\FolioKind}{Research report}
-\linespread{1.10}
-\renewcommand{\maketitle}{%
-  \FolioMasthead\vspace{12pt}%
-  \FolioHeadline{\rmfamily\mdseries}{43}{45}%
-  \vspace{6pt}\FolioDeck\FolioByline\vspace{10pt}%
-  {\color{FolioRule}\hrule height .5pt}\vspace{4pt}}
+\linespread{1.07}
+\renewcommand{\maketitle}{\FolioJournalTitle{46}{45}}
 \setcounter{secnumdepth}{1}
-\titleformat{\section}[hang]{\fontsize{18}{22}\selectfont\bfseries\color{FolioInk}}%
-  {\llap{\sffamily\bfseries\small\color{FolioAccent}\thesection\hspace{.8em}}}{0pt}{\raggedright}
-\titlespacing*{\section}{0pt}{19pt plus 2pt minus 2pt}{6pt}
+\titleformat{\section}{\FolioDisplay\fontsize{21}{24}\selectfont\color{FolioInk}}%
+  {\llap{\sffamily\small\color{FolioAccent}\thesection\hspace{1em}}}{0pt}{\FolioTitleRaggedRight}
+\titlespacing*{\section}{0pt}{16pt plus 2pt minus 1pt}{4pt}

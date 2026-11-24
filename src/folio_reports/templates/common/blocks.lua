@@ -158,7 +158,7 @@ local function heatmap(d)
   local lo,hi=finite(required(d,"min")),finite(required(d,"max"))
   if lo>=hi then error("Heatmap max must exceed min") end
   local out={command("\\FolioHeatTitle",{text(required(d,"label"))}),
-    latex("\\begin{tabularx}{\\linewidth}{@{}p{.20\\linewidth}*{" .. #labels .. "}{>{\\centering\\arraybackslash}X}}\\toprule")}
+    latex("\\noindent\\begin{tabularx}{\\linewidth}{@{}p{.20\\linewidth}*{" .. #labels .. "}{>{\\centering\\arraybackslash}X}}\\toprule")}
   local header={text(d.attributes.stub or "")}
   for _,label in ipairs(labels) do
     table.insert(header,raw("&"));table.insert(header,text(label))
@@ -234,7 +234,46 @@ local function distribution(d)
   return command("\\FolioDistribution",args)
 end
 
+-- Keep Pandoc's native tables, alignment, captions and repeating headers.
+local function table_layout(d)
+  local tab = d.content[1]
+  if not tab or tab.t ~= "Table" or #d.content > 2 then
+    error("table-layout expects a table and an optional note paragraph")
+  end
+  local note = d.content[2]
+  if note and note.t ~= "Para" then error("A table note must be a paragraph") end
+
+  local percent = (d.attributes.width or "100%"):match("^([%d.]+)%%$")
+  if not percent then error("Table width must be a percentage") end
+  local measure = finite(percent) / 100
+  if measure <= 0 or measure > 1 then
+    error("Table width must be greater than 0% and at most 100%")
+  end
+
+  local widths = split(required(d, "widths"), ",")
+  local specs = tab.colspecs
+  if #widths ~= #specs then error("Supply one width for each table column") end
+  local largest = 0
+  for i, part in ipairs(widths) do
+    widths[i] = finite(part)
+    if widths[i] <= 0 then error("Column widths must be positive") end
+    largest = math.max(largest, widths[i])
+  end
+  -- Normalize before summing so equally large finite weights stay usable.
+  local total = 0
+  for i, weight in ipairs(widths) do
+    widths[i] = weight / largest
+    total = total + widths[i]
+  end
+  for i, spec in ipairs(specs) do specs[i] = {spec[1], widths[i] / total} end
+  tab.colspecs = specs
+  local content = {tab}
+  if note then append(content, environment("FolioTableNote", {}, {note})) end
+  return environment("FolioTable", {text(coordinate(measure))}, content)
+end
+
 local handlers = {
+  ["table-layout"]=table_layout,
   scorecard=scorecard, flow=flow, intervalplot=intervalplot, heatmap=heatmap, distribution=distribution,
   appendix=function(d) empty_body(d); return latex("\\clearpage\\appendix\\setcounter{secnumdepth}{1}") end,
   metric=function(d) return environment("FolioMetric", {text(required(d,"value"))}, d.content) end,

@@ -1,12 +1,7 @@
-% A compact masthead, a display headline and clear pauses between decisions.
-\definecolor{FolioAccent}{HTML}{00645D}
+% Journal typography for a decision brief.
+\definecolor{FolioAccent}{HTML}{863D2E}
 \newcommand{\FolioKind}{Decision brief}
 \linespread{1.07}
-\renewcommand{\maketitle}{%
-  \FolioMasthead\vspace{9pt}%
-  \FolioHeadline{\sffamily\bfseries}{38}{40}%
-  \vspace{5pt}\FolioDeck\FolioByline\vspace{9pt}%
-  {\color{FolioRule}\hrule height .5pt}\vspace{6pt}}
-\titleformat{\section}{\sffamily\bfseries\fontsize{15}{18}\selectfont\color{FolioAccent}}%
-  {\thesection}{.65em}{\raggedright}
-\titlespacing*{\section}{0pt}{16pt plus 2pt minus 2pt}{4pt}
+\renewcommand{\maketitle}{\FolioJournalTitle{50}{48}}
+\titleformat{\section}{\FolioDisplay\fontsize{20}{23}\selectfont\color{FolioInk}}{\thesection}{.6em}{\FolioTitleRaggedRight}
+\titlespacing*{\section}{0pt}{13pt plus 2pt minus 1pt}{3pt}

@@ -93,3 +93,56 @@ def test_new_cli_style_and_legacy_build(tmp_path: Path) -> None:
     (plain / "folio.yaml").write_text("from: markdown\nto: latex\nstandalone: true\n")
     (plain / "report.md").write_text("An existing report.")
     assert "An existing report." in build(plain, plain / "legacy.tex").read_text()
+
+
+def test_table_layout_preserves_column_alignment_and_caption(tmp_path: Path) -> None:
+    project = new("research", tmp_path / "book")
+    (project / "report.md").write_text(
+        '::: {.table-layout widths="1,3"}\n\n'
+        "| Period | Visits |\n|:---|---:|\n| Morning | 16 |\n\n"
+        ": Counts by period\n\n:::\n"
+    )
+    body = (
+        build(project, project / "proof.tex").read_text().split(r"\begin{document}")[1]
+    )
+    assert "0.25" in body
+    assert "0.75" in body
+    assert r"\raggedleft" in body
+    assert "Counts by period" in body
+
+
+@pytest.mark.parametrize("widths", ["0,2", "1", "1,nan", "1,2,3"])
+def test_table_layout_rejects_invalid_widths(tmp_path: Path, widths: str) -> None:
+    project = new("brief", tmp_path / "book")
+    (project / "report.md").write_text(
+        f'::: {{.table-layout widths="{widths}"}}\n\n'
+        "| A | B |\n|---|---:|\n| Morning | 16 |\n\n:::\n"
+    )
+    with pytest.raises(subprocess.CalledProcessError):
+        build(project, project / "proof.tex")
+
+
+def test_compact_table_keeps_note_with_selected_measure(tmp_path: Path) -> None:
+    project = new("research", tmp_path / "book")
+    (project / "report.md").write_text(
+        '::: {.table-layout widths="1,2" width="75%"}\n\n'
+        "| Period | Visits |\n|---|---:|\n| Morning | 16 |\n\n"
+        "The count includes **return visits**.\n\n:::\n"
+    )
+    body = (
+        build(project, project / "proof.tex").read_text().split(r"\begin{document}")[1]
+    )
+    assert r"\begin{FolioTable}{0.750000}" in body
+    assert body.index(r"\begin{FolioTableNote}") < body.index(r"\textbf{return visits}")
+    assert body.index(r"\end{FolioTableNote}") < body.index(r"\end{FolioTable}")
+
+
+@pytest.mark.parametrize("width", ["0%", "125%", "wide"])
+def test_invalid_table_measure(tmp_path: Path, width: str) -> None:
+    project = new("brief", tmp_path / "book")
+    (project / "report.md").write_text(
+        f'::: {{.table-layout widths="1,1" width="{width}"}}\n\n'
+        "| A | B |\n|---|---:|\n| Morning | 16 |\n\n:::\n"
+    )
+    with pytest.raises(subprocess.CalledProcessError):
+        build(project, project / "proof.tex")
