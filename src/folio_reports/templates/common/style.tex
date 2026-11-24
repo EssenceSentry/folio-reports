@@ -1,5 +1,5 @@
 % Shared Folio typography and page furniture. Edit the palette in layout.tex.
-\usepackage{fancyhdr,titlesec,caption}
+\usepackage{fancyhdr,titlesec,caption,graphicx}
 \usepackage{ragged2e}
 % Resolve the same OpenType faces from the TeX distribution on every machine.
 \setmainfont{texgyrepagella-regular.otf}[
@@ -14,6 +14,14 @@
 \newcommand{\FolioSubtitle}{}
 \providecommand{\subtitle}[1]{\renewcommand{\FolioSubtitle}{#1}}
 \newcommand{\FolioLabel}[1]{{\sffamily\bfseries\fontsize{8.5}{11}\selectfont #1}}
+% Finite stretch gives TeX a reason to balance the last line of display type.
+% Leave the spaces between words at their natural width.
+\newcommand{\FolioTitleSpacing}{%
+  \parfillskip=0pt\spaceskip=\fontdimen2\font\hyphenpenalty=10000\relax}
+\newcommand{\FolioTitleCentered}{%
+  \centering\leftskip=0pt plus .5\linewidth\rightskip=\leftskip\FolioTitleSpacing}
+\newcommand{\FolioTitleRaggedRight}{%
+  \raggedright\rightskip=0pt plus 1\linewidth\FolioTitleSpacing}
 \makeatletter
 \newcommand{\FolioByline}{%
   \begingroup\small\sffamily\color{FolioMuted}\def\and{, }%
@@ -25,7 +33,7 @@
 \renewcommand{\footrulewidth}{0.4pt}
 \renewcommand{\footrule}{\color{FolioRule}\hrule width\headwidth height\footrulewidth}
 \fancyfoot[L]{\small\sffamily\color{FolioMuted}\FolioKind}
-\fancyfoot[R]{\small\sffamily\color{FolioMuted}\thepage}
+\fancyfoot[R]{\small\sffamily\bfseries\color{FolioInk}\thepage}
 \setlength{\parindent}{0pt}
 \AtBeginDocument{\color{FolioInk}\setlength{\parskip}{5pt plus 1pt minus 1pt}}
 \raggedbottom
@@ -34,20 +42,26 @@
 \setlength{\tabcolsep}{7pt}
 \renewcommand{\arraystretch}{1.22}
 \AtBeginDocument{\ifdefined\LTleft\setlength{\LTleft}{0pt}\fi}
-\captionsetup{font={small,sf},labelfont=bf,justification=raggedright,singlelinecheck=false,skip=7pt}
+\DeclareCaptionFont{folioaccent}{\color{FolioAccent}}
+\captionsetup{font={small,sf},labelfont={bf,folioaccent},labelsep=quad,
+  justification=raggedright,singlelinecheck=false,skip=7pt}
 \newcommand{\FolioMasthead}{%
-  {\color{FolioAccent}\rule{20mm}{2pt}}\par\vspace{3pt}%
-  {\color{FolioAccent}\FolioLabel{\MakeUppercase{\FolioKind}}}\par}
+  \noindent{\color{FolioAccent}\FolioLabel{\addfontfeatures{LetterSpace=8}\MakeUppercase{\FolioKind}}%
+    \hspace{.9em}\raisebox{.37ex}{\rule{22mm}{1.2pt}}}\par}
 \newcommand{\FolioDeck}{%
   \ifx\FolioSubtitle\empty\else
-  {\large\color{FolioMuted}\RaggedRight\FolioSubtitle\par}\vspace{4pt}\fi}
-% A short statistical callout. Longer explanations belong in body text.
+  {\fontsize{14}{18}\selectfont\color{FolioMuted}\FolioTitleRaggedRight\FolioSubtitle\par}\vspace{4pt}\fi}
+% Keep a short figure prominent and scale a wider value to its column.
+\newsavebox{\FolioMetricBox}
 \newenvironment{FolioMetric}[1]{%
-  \par\addvspace{8pt}\noindent\begin{minipage}{\linewidth}
-  {\color{FolioRule}\hrule}\vspace{7pt}
-  \noindent\begin{minipage}[c]{.26\linewidth}\raggedright
-  \color{FolioAccent}\sffamily\bfseries\fontsize{35}{38}\selectfont #1
-  \end{minipage}\hfill\begin{minipage}[c]{.70\linewidth}\RaggedRight
-}{\end{minipage}\par\vspace{7pt}{\color{FolioRule}\hrule}\end{minipage}\par\addvspace{4pt}}
+  \par\addvspace{10pt}\noindent\begin{minipage}{\linewidth}
+  {\color{FolioAccent}\hrule height 1pt}\vspace{9pt}
+  \noindent\begin{minipage}[c]{.22\linewidth}
+    \sbox{\FolioMetricBox}{{\color{FolioAccent}\sffamily\bfseries\fontsize{42}{43}\selectfont #1}}%
+    \ifdim\wd\FolioMetricBox>\linewidth
+      \resizebox{\linewidth}{!}{\usebox{\FolioMetricBox}}%
+    \else\usebox{\FolioMetricBox}\fi
+  \end{minipage}\hfill\begin{minipage}[c]{.74\linewidth}\RaggedRight
+}{\end{minipage}\par\vspace{9pt}{\color{FolioRule}\hrule}\end{minipage}\par\addvspace{5pt}}
 \titleformat{\subsection}{\sffamily\bfseries\normalsize\color{FolioInk}}{\thesubsection}{.65em}{}
-\titlespacing*{\subsection}{0pt}{9pt}{1pt}
+\titlespacing*{\subsection}{0pt}{10pt}{3pt}

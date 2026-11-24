@@ -43,6 +43,20 @@ local function coordinate(x)
   return string.format("%.6f", x)
 end
 
+-- Keep integer differences exact on same-sign axes. An axis crossing zero
+-- can exceed the integer range, or even the floating-point range.
+local function axis_fraction(x, lo, hi)
+  if lo < 0 and hi >= 0 then
+    x, lo, hi = x + 0.0, lo + 0.0, hi + 0.0
+    if hi - lo == math.huge then x, lo, hi = x / 2, lo / 2, hi / 2 end
+  end
+  return (x - lo) / (hi - lo)
+end
+
+local function axis_position(x, lo, hi)
+  return coordinate(axis_fraction(x, lo, hi))
+end
+
 local function percent(div, key)
   local x = finite(required(div, key))
   if x < 0 or x > 100 then error(key .. " must be between 0 and 100") end
@@ -86,10 +100,14 @@ local function trend(div)
   if #values < 2 then error("A trend needs at least two observations") end
   local points = {}
   for i, y in ipairs(values) do
-    points[i] = "(" .. coordinate((i-1)/(#values-1)) .. "," .. coordinate((y-a)/(b-a)) .. ")"
+    points[i] = "(" .. coordinate((i-1)/(#values-1)) .. "," .. axis_position(y,a,b) .. ")"
   end
-  return command("\\FolioTrend", {text(required(div,"label")), text(low), text(high),
+  local chart = command("\\FolioTrend", {text(required(div,"label")), text(low), text(high),
     text(required(div,"start")), text(required(div,"end")), raw(table.concat(points," ")), raw(points[#points])})
+  if #values <= 12 then
+    return {latex("\\begingroup\\FolioTrendPoints"), chart, latex("\\endgroup")}
+  end
+  return chart
 end
 
 
@@ -140,7 +158,7 @@ local function heatmap(d)
   local lo,hi=finite(required(d,"min")),finite(required(d,"max"))
   if lo>=hi then error("Heatmap max must exceed min") end
   local out={command("\\FolioHeatTitle",{text(required(d,"label"))}),
-    latex("\\begin{tabularx}{\\linewidth}{@{}p{.20\\linewidth}*{" .. #labels .. "}{>{\\centering\\arraybackslash}X}@{}}\\toprule")}
+    latex("\\begin{tabularx}{\\linewidth}{@{}p{.20\\linewidth}*{" .. #labels .. "}{>{\\centering\\arraybackslash}X}}\\toprule")}
   local header={text(d.attributes.stub or "")}
   for _,label in ipairs(labels) do
     table.insert(header,raw("&"));table.insert(header,text(label))
@@ -155,13 +173,46 @@ local function heatmap(d)
     for _,s in ipairs(values) do
       local x=finite(s)
       if x<lo or x>hi then error("Heatmap observation outside its scale") end
-      local shade=math.floor(5+31*(x-lo)/(hi-lo)+.5)
+      local shade=math.floor(5+31*axis_fraction(x,lo,hi)+.5)
       table.insert(line,raw("&\\cellcolor{FolioAccent!" .. shade .. "!white}"))
       table.insert(line,text(s))
     end
     table.insert(line,raw("\\\\"));table.insert(out,pandoc.Plain(line))
   end
   table.insert(out,latex("\\bottomrule\\end{tabularx}"))
+  return out
+end
+
+local function intervalplot(d)
+  local lo, hi = finite(required(d,"min")), finite(required(d,"max"))
+  if hi <= lo then error("Interval plot max must exceed min") end
+  if #d.content == 0 then error("Interval plot needs at least one .row") end
+
+  local out = {latex("\\begingroup")}
+  if d.attributes.reference then
+    local ref = finite(d.attributes.reference)
+    if ref < lo or ref > hi then error("Reference outside its axis") end
+    table.insert(out, command("\\FolioRangeReference", {raw(axis_position(ref,lo,hi)), text(d.attributes.reference)}))
+  end
+  table.insert(out, latex("\\begin{FolioRanges}"))
+  table.insert(out, pandoc.Plain({raw("\\multicolumn{4}{@{}p{\\linewidth}@{}}{\\FolioRangeTitle{"),
+    text(required(d,"label")), raw("}}\\\\\\midrule")}))
+  table.insert(out, pandoc.Plain({text(d.attributes.stub or "Group"), raw("&\\FolioRangeAxis{"),
+    text(d.attributes.min), raw("}{"), text(d.attributes.max), raw("}&"), text("Estimate"), raw("&"),
+    text(d.attributes["interval-label"] or "Interval"), raw("\\\\\\midrule\\endhead")}))
+  for _, row in ipairs(d.content) do
+    if row.t ~= "Div" or not row.classes:includes("row") then error("Interval plot expects .row blocks") end
+    empty_body(row)
+    local l, v, h = finite(required(row,"low")), finite(required(row,"value")), finite(required(row,"high"))
+    if l > v or v > h then error("Expected low <= value <= high") end
+    if l < lo or h > hi then error("Interval plot observation outside its axis") end
+    local mark = "\\FolioRangeMark{" .. axis_position(l,lo,hi) .. "}{" ..
+      axis_position(v,lo,hi) .. "}{" .. axis_position(h,lo,hi) .. "}"
+    table.insert(out, pandoc.Plain({text(required(row,"label")), raw("&" .. mark .. "&"),
+      text(row.attributes.value), raw("&"), text("[" .. row.attributes.low .. ", " .. row.attributes.high .. "]"),
+      raw("\\\\")}))
+  end
+  table.insert(out, latex("\\bottomrule\\end{FolioRanges}\\endgroup"))
   return out
 end
 
@@ -175,7 +226,7 @@ local function distribution(d)
   for _,s in ipairs(nums) do
     local x=finite(s)
     if x<previous or x>upper then error("Box plot summary must be ordered and within its axis") end
-    table.insert(coords,raw(coordinate((x-lower)/(upper-lower))))
+    table.insert(coords,raw(axis_position(x,lower,upper)))
     previous=x
   end
   local args={text(required(d,"label")),text(table.concat(nums," / ")),text(d.attributes.min),text(d.attributes.max)}
@@ -184,7 +235,7 @@ local function distribution(d)
 end
 
 local handlers = {
-  scorecard=scorecard, flow=flow, heatmap=heatmap, distribution=distribution,
+  scorecard=scorecard, flow=flow, intervalplot=intervalplot, heatmap=heatmap, distribution=distribution,
   appendix=function(d) empty_body(d); return latex("\\clearpage\\appendix\\setcounter{secnumdepth}{1}") end,
   metric=function(d) return environment("FolioMetric", {text(required(d,"value"))}, d.content) end,
   pullquote=function(d) return environment("FolioQuote", {text(d.attributes.by or "")}, d.content) end,

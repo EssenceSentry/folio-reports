@@ -4,7 +4,7 @@ subtitle: A working specimen for reports on the East Room pilot
 author: Library planning office
 date: November 2026
 bibliography: references.bib
-reference-section-title: Method reference
+reference-section-title: Method references
 ---
 
 ::: {.summary}
@@ -44,7 +44,7 @@ Source: synthetic desk counts and illustrative staff notes. Every page uses the 
 
 # Reading the evening count
 
-The distribution below uses all 200 visits. The three bars share a zero baseline and a 100% scale.
+Of 200 visits, 80 began before 17:00, 48 between 17:00 and 18:00, and 72 after 18:00. Each full bar spans 100% of visits.
 
 ::: {.bar label="Before 17:00" value="40"}
 :::
@@ -63,15 +63,15 @@ The distribution below uses all 200 visits. The three bars share a zero baseline
 ::: {.trend label="Evening visits per week" min="0" max="30" start="Week 1" end="Week 4" values="12,16,20,24"}
 :::
 
-| Week | All visits | Evening visits |
-|:-----|-----------:|---------------:|
-| 1    | 50         | 12             |
-| 2    | 50         | 16             |
-| 3    | 50         | 20             |
-| 4    | 50         | 24             |
+| Week | All visits | Evening visits | Evening share |
+|:-----|-----------:|---------------:|--------------:|
+| 1    | 50         | 12             | 24%           |
+| 2    | 50         | 16             | 32%           |
+| 3    | 50         | 20             | 40%           |
+| 4    | 50         | 24             | 48%           |
 
 ::: {.source}
-The four values in the line chart sum to 72. The table preserves each count for readers who need the exact value.
+Evening arrivals doubled from 12 to 24 while total weekly visits held at 50. The appendix compares the weekly shares and their uncertainty.
 :::
 
 ::: {.pagebreak}
@@ -144,7 +144,18 @@ Four weeks of baseline data cannot establish whether longer hours cause more vis
 
 [^window]: Keep the same weekday composition when comparing observation windows.
 
-The interval on the preceding data page uses Wilson's score method [@wilson1927].
+The interval for the pooled share uses Wilson's score method [@wilson1927].
+
+## What the desk log needs
+
+Arrival
+: Local time when a visitor enters the room.
+
+Departure
+: Local time when that visit ends.
+
+Shift identifier
+: The date and scheduled closing time, retained for comparisons between days.
 
 ::: {.pagebreak}
 :::
@@ -187,7 +198,7 @@ Pilot authorization and date
 
 # Counts behind the pilot
 
-This matrix breaks the same 72 evening visits down by weekday. Each week's six counts add up to the corresponding total in the line chart. Darker cells indicate more visits on a common scale from zero to eight.
+Tuesdays and Thursdays accounted for 39 of the 72 evening arrivals. Darker cells show higher counts on a shared scale of zero to eight.
 
 ::::: {.heatmap label="Evening arrivals by day" stub="Week" columns="Mon|Tue|Wed|Thu|Fri|Sat" min="0" max="8"}
 ::: {.row label="Week 1" values="1,3,1,3,2,2"}
@@ -200,20 +211,22 @@ This matrix breaks the same 72 evening visits down by weekday. Each week's six c
 :::
 :::::
 
+## How much did the evening share change?
+
+::::: {.intervalplot label="Difference from week 1 (percentage points)" stub="Period" interval-label="95% interval" min="-20" max="50" reference="0"}
+::: {.row label="Week 2" low="-9.5" value="+8" high="+24.9"}
+:::
+::: {.row label="Week 3" low="-2.3" value="+16" high="+32.9"}
+:::
+::: {.row label="Week 4" low="+5.2" value="+24" high="+40.6"}
+:::
+:::::
+
+Week 4 reached 48%, up from 24% in week 1. The pointwise intervals compare independent groups of 50 visits each using the score method of @newcombe1998.
+
 ## How long did a visit last?
 
 ::: {.distribution label="Visit duration in minutes" min="0" max="90" summary="4,12,23,38,76"}
 :::
 
-The five numbers are the minimum, first quartile, median, third quartile and maximum of an illustrative duration distribution. The box spans the middle half of visits. The central line marks the median.
-
-## What the desk log needs
-
-Arrival
-: Local time when a visitor enters the room.
-
-Departure
-: Local time when that visit ends.
-
-Shift identifier
-: The date and scheduled closing time, retained for comparisons between days.
+The middle half of visits lasted 12 to 38 minutes, with a median of 23. The whiskers mark the shortest and longest visits.

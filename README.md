@@ -2,11 +2,9 @@
 
 Write the finding in Markdown. Give the person reading it a PDF they can take into a meeting, annotate, or print. Folio supplies the typography, figure captions, tables, and page furniture. You own the text and the LaTeX in each project.
 
-**[Compare ten styles on the same brief](examples/style-lookbook.pdf)** · **[Open the six-page component specimen](examples/component-specimen.pdf)**
+[Open the one-page decision brief](examples/decision-brief.pdf) · [Read the two-page research report](examples/research-report.pdf) · [Explore the component specimen](examples/component-specimen.pdf)
 
-[Decision brief](examples/decision-brief.pdf) · [Research report](examples/research-report.pdf)
-
-![Ten typeset mastheads, from the centered Gazette to the dark Signal banner.](examples/style-previews.webp)
+![A one-page decision brief beside a research report showing the supporting figure, data and methods.](examples/report-previews.webp)
 
 ## Choose a starting point
 
@@ -20,17 +18,19 @@ The brief and research examples use the same synthetic transit observations. The
 
 ## Make your first report
 
-Install [Pandoc](https://pandoc.org/installing.html) and [Tectonic](https://tectonic-typesetting.github.io/), then install the CLI from this checkout with Python 3.12 or newer.
+Install [Pandoc](https://pandoc.org/installing.html) and [Tectonic](https://tectonic-typesetting.github.io/). With Python 3.12 or newer and uv, install Folio directly from GitHub.
 
 ```sh
-uv tool install --editable .
-folio-reports new brief my-brief
+uv tool install git+https://github.com/EssenceSentry/folio-reports.git
+folio-reports new brief my-brief --title "Autumn service review" --author "Planning team"
 folio-reports build my-brief
 ```
 
-Open `my-brief/report.pdf`. Edit `my-brief/report.md` and run the build again. For the longer format, use `folio-reports new research my-study`. Tectonic downloads its TeX packages on the first build.
+Open `my-brief/report.pdf` for a proof of the title and byline. Write below the metadata in `my-brief/report.md` and rebuild. To explore a finished example first, run `folio-reports new brief worked-example`. Tectonic downloads its TeX packages on the first build.
 
 ## Choose a visual style
+
+Compare the ten treatments on the same manuscript in the [style lookbook](examples/style-lookbook.pdf), or scan the [masthead gallery](examples/style-previews.webp).
 
 ```sh
 folio-reports styles
@@ -42,7 +42,7 @@ The preview uses the same manuscript and leaves the project's saved style intact
 
 ## Choose a component
 
-Create a worked example with `folio-reports new specimen my-components`. Its Markdown shows how to write a decision callout, plot a range, compare two options, set a timeline or lay out an appendix. The PDF keeps numbers and labels selectable and draws the charts as vectors. [Component reference](docs/components.md) · [Editable specimen](src/folio_reports/templates/specimen/report.md)
+Create a worked example with `folio-reports new specimen my-components`. Its Markdown shows how to write a decision callout, compare two options, and place a chart beside the exact estimates and bounds. In the appendix, three changes in evening visits share one axis, so readers can see which intervals cross zero. The chart and labels stay sharp at any zoom. [Component reference](docs/components.md) · [Editable specimen](src/folio_reports/templates/specimen/report.md)
 
 ## Make it yours
 

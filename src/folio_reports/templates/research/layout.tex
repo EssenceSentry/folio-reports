@@ -1,12 +1,13 @@
-% Display serif, numbered sections and a warm accent for extended reading.
+% A reading spread with a display serif and section locators in the margin.
 \definecolor{FolioAccent}{HTML}{8C492F}
 \newcommand{\FolioKind}{Research report}
+\linespread{1.10}
 \renewcommand{\maketitle}{%
-  \FolioMasthead\vspace{7pt}%
-  {\fontsize{38}{40}\selectfont\raggedright\hyphenpenalty=10000\FolioTitle\par}%
-  \vspace{4pt}\FolioDeck\FolioByline\vspace{6pt}%
+  \FolioMasthead\vspace{12pt}%
+  \FolioHeadline{\rmfamily\mdseries}{43}{45}%
+  \vspace{6pt}\FolioDeck\FolioByline\vspace{10pt}%
   {\color{FolioRule}\hrule height .5pt}\vspace{4pt}}
 \setcounter{secnumdepth}{1}
-\titleformat{\section}{\Large\bfseries\color{FolioInk}}%
-  {\small\sffamily\bfseries\color{FolioAccent}\thesection}{.8em}{}
-\titlespacing*{\section}{0pt}{15pt}{4pt}
+\titleformat{\section}[hang]{\fontsize{18}{22}\selectfont\bfseries\color{FolioInk}}%
+  {\llap{\sffamily\bfseries\small\color{FolioAccent}\thesection\hspace{.8em}}}{0pt}{\raggedright}
+\titlespacing*{\section}{0pt}{19pt plus 2pt minus 2pt}{6pt}

@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 from pathlib import Path
 from unittest.mock import patch
@@ -32,3 +33,36 @@ def test_version_flag(capsys: pytest.CaptureFixture[str]) -> None:
         main(["--version"])
     assert exc.value.code == 0
     assert __version__ in capsys.readouterr().out
+
+
+def test_cli_blank_flag(tmp_path: Path) -> None:
+    project = tmp_path / "new report"
+    assert main(["new", "research", str(project), "--blank"]) == 0
+    assert not (project / "references.bib").exists()
+
+
+@pytest.mark.skipif(shutil.which("pandoc") is None, reason="TeX export requires Pandoc")
+def test_cli_personal_manuscript_renders_metadata(tmp_path: Path) -> None:
+    project = tmp_path / "draft"
+    assert (
+        main(
+            [
+                "new",
+                "research",
+                str(project),
+                "--title",
+                "Q4: 8% & #5",
+                "--author",
+                'Zoë "Z" García',
+                "--style",
+                "ledger",
+            ]
+        )
+        == 0
+    )
+    output = tmp_path / "proof.tex"
+    assert main(["build", str(project), "-o", str(output)]) == 0
+    tex = output.read_text()
+    assert r"\title{Q4: 8\% \& \#5}" in tex
+    assert "García" in tex
+    assert "Alder Junction" not in tex

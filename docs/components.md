@@ -34,7 +34,8 @@ Of 200 recorded visits, **72 began after 18:00**.
 | `.comparison` | Two nested `.column` blocks with a `title` and short prose or lists |
 | `.bar` | `label` and `value` from 0 to 100. Length encodes the percentage on a common baseline |
 | `.interval` | `label`, `low`, `value`, `high` on a 0–100 percent scale. A dot and whiskers show the estimate and bounds |
-| `.trend` | `values` as comma-separated observations, explicit `min` and `max`, a `label` with units, and `start` and `end` labels. Observations are equally spaced |
+| `.intervalplot` | A shared numeric axis for several estimates and intervals, with an optional reference and an exact-value table. Each nested `.row` supplies `label`, `low`, `value` and `high` |
+| `.trend` | `values` as comma-separated observations, explicit `min` and `max`, a `label` with units, and `start` and `end` labels. Observations are equally spaced. Series of up to twelve observations show a dot at each sample |
 | `.distribution` | Five comma-separated values in `summary` giving the lower whisker, first quartile, median, third quartile and upper whisker. Supply axis `min`, `max`, and a descriptive `label` |
 | `.heatmap` | Two to six `columns` separated by vertical bars, a `label`, `min`, `max` and optional `stub` heading. Each nested `.row` supplies a label and matching numeric values. Every cell prints its value |
 
@@ -56,6 +57,21 @@ Arrivals after 18:00.
 ::: {.trend label="Visits per week" min="0" max="30" start="Week 1" end="Week 4" values="12,16,20,24"}
 :::
 ````
+
+### Compare estimates on one axis
+
+Use `.intervalplot` for signed differences, counts, percentages or other estimates in a common unit. Set `min` and `max` to cover every interval, and give the units in `label`. The dot marks the estimate. The whiskers and the numeric interval column give its bounds. An optional `reference` draws a dashed mark at the same value in each row. Set `stub` to name the row groups and `interval-label` to describe the bounds.
+
+````markdown
+::::: {.intervalplot label="Change in evening share (percentage points)" min="-20" max="50" reference="0" stub="Comparison" interval-label="95% interval"}
+::: {.row label="Week 2 vs 1" low="-9.5" value="+8" high="+24.9"}
+:::
+::: {.row label="Week 4 vs 1" low="+5.2" value="+24" high="+40.6"}
+:::
+:::::
+````
+
+Each row uses author-supplied numbers in the order `low <= value <= high`. Include the interval method and sample sizes in the surrounding prose. The plot keeps the supplied numeric precision in its table and repeats its headers across page breaks.
 
 Use attribute-only blocks for bars, intervals, trends, distribution plots and heatmap rows. Keep scorecards, comparisons and flows short enough to read together on one page. For long comparisons, use a Markdown table or separate sections.
 
@@ -88,4 +104,4 @@ Use attribute-only blocks for bars, intervals, trends, distribution plots and he
 
 ## Rebuild the visual catalog
 
-From the checkout, run `uv run --with-editable . --script examples/build_catalog.py`. This typesets the same brief in all ten styles, bookmarks each style in the lookbook, crops its actual masthead for the visual index, and builds the six-page specimen. The authoring CLI needs Pandoc and Tectonic. The catalog script also uses Poppler's `pdftoppm` and installs its own Python image and PDF dependencies through uv.
+From the checkout, run `uv run --with-editable . --script examples/build_catalog.py`. The command builds the brief, research report and specimen, then typesets the same brief in all ten styles for the bookmarked lookbook. Both README previews come from those PDFs. The authoring CLI needs Pandoc and Tectonic. The catalog script also uses Poppler's `pdftoppm` and installs its own Python image and PDF dependencies through uv.

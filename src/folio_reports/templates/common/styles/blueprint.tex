@@ -1,10 +1,12 @@
-% Blueprint | technical report with registration marks and a drafting baseline.
+% Blueprint | a drawing title block with registration marks and a ruled legend.
 \definecolor{FolioAccent}{HTML}{204D89}
 \renewcommand{\maketitle}{%
   {\color{FolioAccent}\ttfamily\small +\enspace\MakeUppercase{\FolioKind}\hfill +\par}
-  {\color{FolioAccent}\hrule height .4pt}\vspace{10pt}
-  \FolioHeadline{\sffamily\mdseries}{32}{35}\FolioDeck
-  {\ttfamily\footnotesize\color{FolioAccent}\FolioBylineInline\par}
-  \vspace{5pt}{\color{FolioAccent}\hrule height 1pt}}
+  {\color{FolioAccent}\hrule height .5pt}\vspace{9pt}
+  \FolioHeadline{\sffamily\mdseries}{34}{37}\vspace{4pt}
+  \FolioDeck\vspace{3pt}
+  {\color{FolioRule}\hrule height .4pt}\vspace{4pt}
+  {\ttfamily\small\color{FolioAccent}\FolioBylineInline\par}
+  \vspace{4pt}{\color{FolioAccent}\hrule height 1pt}\vspace{5pt}}
 \FolioHeadings{\ttfamily\bfseries\large}{FolioAccent}
 \fancyfoot[R]{\ttfamily\small\color{FolioAccent}[\thepage]}

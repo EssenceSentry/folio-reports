@@ -1,11 +1,11 @@
 % Shared primitives used by the visual styles.
-\usepackage{needspace,tikz,tcolorbox,tabularx,colortbl,booktabs}
+\usepackage{needspace,tikz,tcolorbox,tabularx,longtable,colortbl,booktabs}
 \tcbuselibrary{breakable,skins}
 \newcommand{\FolioSerif}[1]{\setmainfont{texgyre#1-regular.otf}[
   BoldFont=texgyre#1-bold.otf,ItalicFont=texgyre#1-italic.otf,
   BoldItalicFont=texgyre#1-bolditalic.otf]}
 \newcommand{\FolioHeadline}[3]{{#1\fontsize{#2}{#3}\selectfont
-  \raggedright\hyphenpenalty=10000\FolioTitle\par}}
+  \FolioTitleRaggedRight\FolioTitle\par}}
 \newcommand{\FolioEyebrow}{{\color{FolioAccent}\FolioLabel{\MakeUppercase{\FolioKind}}}}
 \makeatletter
 \newcommand{\FolioBylineInline}{{\def\and{, }\@author
@@ -83,14 +83,42 @@
     \draw[FolioAccent] (#3,0)--(#3,6) (#5,0)--(#5,6);
     \fill[FolioAccent] (#4,3) circle[radius=2pt];
   \end{tikzpicture}\par}
+% Mark individual observations in short series. Dense series keep a clean line.
+\tikzset{folio observations/.style={}}
+\newcommand{\FolioTrendPoints}{\tikzset{folio observations/.style={mark=*,mark size=1.5pt}}}
 \newcommand{\FolioTrend}[7]{\par\addvspace{5pt}\noindent\begin{minipage}{\linewidth}
   \FolioLabel{#1}\par\smallskip
   \begin{tikzpicture}[x=.90\linewidth,y=28mm]
     \draw[FolioRule] (0,0)--(1,0) (0,.5)--(1,.5) (0,1)--(1,1);
     \node[anchor=east,inner sep=2pt,font=\scriptsize\sffamily] at (0,0) {#2};
     \node[anchor=east,inner sep=2pt,font=\scriptsize\sffamily] at (0,1) {#3};
-    \draw[FolioAccent,line width=1.3pt,line join=round] plot coordinates {#6};
+    \draw[FolioAccent,line width=1.3pt,line join=round] plot[folio observations] coordinates {#6};
     \fill[FolioAccent] #7 circle[radius=2pt];
     \node[anchor=north west,inner xsep=0pt,font=\scriptsize\sffamily] at (0,-.04) {#4};
     \node[anchor=north east,inner xsep=0pt,font=\scriptsize\sffamily] at (1,-.04) {#5};
   \end{tikzpicture}\end{minipage}\par\smallskip}
+
+% Shared-scale interval rows. The table repeats its title and scale on a new page.
+\newcommand{\FolioRangeReference}[2]{\def\FolioRangeX{#1}\def\FolioRangeRefLabel{#2}}
+\newcommand{\FolioRangeTitle}[1]{\FolioLabel{#1}%
+  \ifdefined\FolioRangeX\hfill\mbox{\footnotesize\color{FolioMuted}%
+  \tikz[baseline=-.4ex]{\draw[densely dashed](0,-.6ex)--(0,1.3ex);}\enspace Reference \FolioRangeRefLabel}\fi}
+\newenvironment{FolioRanges}{%
+  \small\sffamily\setlength{\LTpre}{4pt}\setlength{\LTpost}{4pt}%
+  \begin{longtable}{@{}>{\RaggedRight\arraybackslash}p{.22\linewidth}%
+    @{\hspace{.025\linewidth}}p{.37\linewidth}%
+    @{\hspace{.025\linewidth}}>{\RaggedLeft\arraybackslash}p{.13\linewidth}%
+    @{\hspace{.025\linewidth}}>{\RaggedLeft\arraybackslash}p{.205\linewidth}@{}}}
+  {\end{longtable}}
+\newcommand{\FolioRangeAxis}[2]{\makebox[\linewidth][s]{\scriptsize\color{FolioMuted}#1\hfill #2}}
+\newcommand{\FolioRangeMark}[3]{%
+  \begin{tikzpicture}[x=\linewidth,y=1pt,baseline=-.55ex]
+    \path[use as bounding box] (0,-3) rectangle (1,3);
+    \draw[FolioRule!70!white] (0,0)--(1,0);
+    \ifdefined\FolioRangeX
+      \draw[FolioMuted,densely dashed] (\FolioRangeX,-7)--(\FolioRangeX,7);
+    \fi
+    \draw[FolioAccent,line width=1pt] (#1,0)--(#3,0);
+    \draw[FolioAccent] (#1,-2.5)--(#1,2.5) (#3,-2.5)--(#3,2.5);
+    \fill[FolioAccent] (#2,0) circle[radius=2pt];
+  \end{tikzpicture}}

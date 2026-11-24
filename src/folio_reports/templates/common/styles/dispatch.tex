@@ -1,11 +1,16 @@
-% Dispatch | correspondence layout with a narrow sender column.
+% Dispatch | the sender and date share a rail beside the subject of the report.
 \definecolor{FolioAccent}{HTML}{293E62}
+\makeatletter
+\newcommand{\FolioSender}{%
+  {\small\sffamily\raggedright\color{FolioMuted}\def\and{, }%
+   \@author\par\@date\par}}
+\makeatother
 \renewcommand{\maketitle}{%
-  {\color{FolioAccent}\hrule height 1.5pt}\vspace{9pt}
-  \noindent\begin{minipage}[t]{.21\linewidth}\vspace{0pt}
-    \raggedright\color{FolioAccent}\FolioLabel{\MakeUppercase{\FolioKind}}\par
+  {\color{FolioAccent}\hrule height 1.5pt}\vspace{10pt}
+  \noindent\begin{minipage}[t]{.24\linewidth}\vspace{0pt}
+    \raggedright\FolioEyebrow\par\vspace{5pt}\FolioSender
   \end{minipage}\hfill
-  \begin{minipage}[t]{.74\linewidth}\vspace{0pt}
-    \FolioHeadline{\sffamily\bfseries}{28}{31}\FolioDeck\FolioByline
-  \end{minipage}\par\vspace{6pt}{\color{FolioRule}\hrule}}
+  \begin{minipage}[t]{.71\linewidth}\vspace{0pt}
+    \FolioHeadline{\sffamily\bfseries}{31}{33}\vspace{3pt}\FolioDeck
+  \end{minipage}\par\vspace{8pt}{\color{FolioRule}\hrule}\vspace{5pt}}
 \FolioHeadings{\sffamily\bfseries\large}{FolioInk}

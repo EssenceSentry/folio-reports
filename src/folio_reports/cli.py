@@ -35,6 +35,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     create.add_argument("layout", choices=LAYOUTS)
     create.add_argument("directory", type=Path)
     create.add_argument("--style", choices=STYLES, default="classic")
+    create.add_argument(
+        "--blank", action="store_true", help="start with an empty manuscript body"
+    )
+    create.add_argument("--title", help="start a blank manuscript with this title")
+    create.add_argument("--author", help="start a blank manuscript with this byline")
     render = commands.add_parser("build", help="typeset the PDF or export LaTeX")
     render.add_argument("directory", type=Path, default=Path.cwd(), nargs="?")
     render.add_argument("-o", "--output", type=Path, help="output .pdf or .tex path")
@@ -48,7 +53,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     try:
         if args.command == "new":
-            result = new(args.layout, args.directory, style=args.style)
+            result = new(
+                args.layout,
+                args.directory,
+                style=args.style,
+                blank=args.blank,
+                title=args.title,
+                author=args.author,
+            )
         else:
             result = build(args.directory, args.output, style=args.style)
     except (ValueError, OSError, subprocess.CalledProcessError) as error:

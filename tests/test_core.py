@@ -62,3 +62,41 @@ def test_reject_nondocument_output(tmp_path: Path) -> None:
     new("research", tmp_path / "case")
     with pytest.raises(ValueError, match="PDF"):
         build(tmp_path / "case", tmp_path / "case" / "report.md")
+
+
+@pytest.mark.parametrize("layout", ["brief", "research", "specimen"])
+def test_blank_project_keeps_design_and_omits_example_content(
+    tmp_path: Path, layout: str
+) -> None:
+    example = new(layout, tmp_path / "example", style="gazette")
+    project = new(layout, tmp_path / "draft", blank=True, style="gazette")
+    resources = [
+        "layout.tex",
+        "folio.yaml",
+        "blocks.lua",
+        "style.tex",
+        "components.tex",
+    ]
+    resources.extend(
+        str(path.relative_to(example)) for path in (example / "styles").glob("*.tex")
+    )
+    assert {
+        str(path.relative_to(project)): path.read_bytes()
+        for path in project.rglob("*")
+        if path.is_file() and path.name != "report.md"
+    } == {name: (example / name).read_bytes() for name in resources}
+    metadata, body = (
+        (project / "report.md").read_text().removeprefix("---\n").split("\n---")
+    )
+    assert "Untitled report" in metadata
+    assert "author:" not in metadata
+    assert not body.strip()
+
+
+@pytest.mark.parametrize(("title", "author"), [("   ", None), (None, "")])
+def test_empty_manuscript_metadata_leaves_no_project(
+    tmp_path: Path, title: str | None, author: str | None
+) -> None:
+    with pytest.raises(ValueError, match="must contain"):
+        new("brief", tmp_path / "draft", title=title, author=author)
+    assert not (tmp_path / "draft").exists()

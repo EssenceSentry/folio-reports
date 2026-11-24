@@ -1,9 +1,12 @@
-% Compact headings, short measure and a sans-serif headline for a decision.
+% A compact masthead, a display headline and clear pauses between decisions.
 \definecolor{FolioAccent}{HTML}{00645D}
 \newcommand{\FolioKind}{Decision brief}
+\linespread{1.07}
 \renewcommand{\maketitle}{%
-  \FolioMasthead\vspace{4pt}%
-  {\sffamily\bfseries\fontsize{31}{34}\selectfont\raggedright\hyphenpenalty=10000\FolioTitle\par}%
-  \vspace{3pt}\FolioDeck\FolioByline\vspace{3pt}}
-\titleformat{\section}{\sffamily\bfseries\large\color{FolioAccent}}{\thesection}{.65em}{}
-\titlespacing*{\section}{0pt}{12pt}{1pt}
+  \FolioMasthead\vspace{9pt}%
+  \FolioHeadline{\sffamily\bfseries}{38}{40}%
+  \vspace{5pt}\FolioDeck\FolioByline\vspace{9pt}%
+  {\color{FolioRule}\hrule height .5pt}\vspace{6pt}}
+\titleformat{\section}{\sffamily\bfseries\fontsize{15}{18}\selectfont\color{FolioAccent}}%
+  {\thesection}{.65em}{\raggedright}
+\titlespacing*{\section}{0pt}{16pt plus 2pt minus 2pt}{4pt}

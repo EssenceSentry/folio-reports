@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 from pathlib import Path
@@ -23,8 +24,29 @@ STYLES = {
 _TEMPLATES = Path(__file__).with_name("templates")
 
 
-def new(layout: str, directory: Path, *, style: str = "classic") -> Path:
-    """Create a report with editable content, fonts, page layout and examples.
+def _blank_manuscript(title: str | None, author: str | None) -> str:
+    metadata = {"title": "Untitled report" if title is None else title}
+    if author is not None:
+        metadata["author"] = author
+    lines = ["---"]
+    for key, value in metadata.items():
+        if not value.strip():
+            raise ValueError(f"The {key} must contain text.")
+        # JSON-quoted strings are valid YAML scalars, including colons and quotes.
+        lines.append(f"{key}: {json.dumps(value, ensure_ascii=False)}")
+    return "\n".join([*lines, "---", "", ""])
+
+
+def new(
+    layout: str,
+    directory: Path,
+    *,
+    style: str = "classic",
+    blank: bool = False,
+    title: str | None = None,
+    author: str | None = None,
+) -> Path:
+    """Create an editable report project from a worked example or a blank manuscript.
 
     Parameters
     ----------
@@ -34,6 +56,14 @@ def new(layout: str, directory: Path, *, style: str = "classic") -> Path:
         New project directory. An existing directory is never reused.
     style : str
         Persistent visual style for the project.
+    blank : bool
+        Start with a title and an empty manuscript body. Omit example assets.
+    title : str or None
+        Title for a blank manuscript. Providing a title selects the blank starter.
+        Defaults to "Untitled report" for a blank manuscript.
+    author : str or None
+        Optional byline for a blank manuscript. Providing an author also selects
+        the blank starter.
 
     Returns
     -------
@@ -53,7 +83,13 @@ def new(layout: str, directory: Path, *, style: str = "classic") -> Path:
     with TemporaryDirectory(dir=directory.parent) as temporary:
         staged = Path(temporary) / "project"
         shutil.copytree(_TEMPLATES / "common", staged)
-        shutil.copytree(_TEMPLATES / layout, staged, dirs_exist_ok=True)
+        if blank or title is not None or author is not None:
+            shutil.copy2(_TEMPLATES / layout / "layout.tex", staged)
+            (staged / "report.md").write_text(
+                _blank_manuscript(title, author), encoding="utf-8"
+            )
+        else:
+            shutil.copytree(_TEMPLATES / layout, staged, dirs_exist_ok=True)
         defaults = staged / "folio.yaml"
         defaults.write_text(
             defaults.read_text().replace(
