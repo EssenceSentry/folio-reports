@@ -5,9 +5,8 @@ pdf-engine: tectonic
 citeproc: true
 filters:
   - blocks.lua
-include-in-header:
-  - style.tex
-  - layout.tex
+metadata:
+  folio-style: classic
 variables:
   documentclass: article
   papersize: a4

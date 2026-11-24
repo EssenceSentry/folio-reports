@@ -1,0 +1,10 @@
+% Gazette | centered serif title with the rules of a newspaper.
+\definecolor{FolioAccent}{HTML}{6F303C}
+\FolioSerif{termes}
+\renewcommand{\maketitle}{%
+  {\centering\FolioEyebrow\par}\vspace{3pt}
+  \hrule height .8pt\vspace{1.5pt}\hrule height .35pt\vspace{10pt}
+  {\centering\bfseries\fontsize{35}{37}\selectfont\hyphenpenalty=10000\FolioTitle\par}
+  \vspace{4pt}{\centering\large\itshape\FolioSubtitle\par}
+  \vspace{5pt}{\centering\FolioByline}\vspace{6pt}\hrule height .6pt}
+\FolioHeadings{\rmfamily\bfseries\Large}{FolioInk}

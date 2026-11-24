@@ -9,7 +9,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from folio_reports import __version__
-from folio_reports.core import LAYOUTS, build, new
+from folio_reports.core import LAYOUTS, STYLES, build, new
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -30,18 +30,27 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--version", action="version", version=f"%(prog)s {__version__}"
     )
     commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("styles", help="list the available visual styles")
     create = commands.add_parser("new", help="copy an editable report starter")
     create.add_argument("layout", choices=LAYOUTS)
     create.add_argument("directory", type=Path)
+    create.add_argument("--style", choices=STYLES, default="classic")
     render = commands.add_parser("build", help="typeset the PDF or export LaTeX")
     render.add_argument("directory", type=Path, default=Path.cwd(), nargs="?")
     render.add_argument("-o", "--output", type=Path, help="output .pdf or .tex path")
+    render.add_argument(
+        "--style", choices=STYLES, help="preview a style for this build"
+    )
     args = parser.parse_args(argv)
+    if args.command == "styles":
+        for name, description in STYLES.items():
+            print(f"{name:12} {description}")
+        return 0
     try:
         if args.command == "new":
-            result = new(args.layout, args.directory)
+            result = new(args.layout, args.directory, style=args.style)
         else:
-            result = build(args.directory, args.output)
+            result = build(args.directory, args.output, style=args.style)
     except (ValueError, OSError, subprocess.CalledProcessError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2

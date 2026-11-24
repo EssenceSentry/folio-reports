@@ -1,0 +1,11 @@
+% Dispatch | correspondence layout with a narrow sender column.
+\definecolor{FolioAccent}{HTML}{293E62}
+\renewcommand{\maketitle}{%
+  {\color{FolioAccent}\hrule height 1.5pt}\vspace{9pt}
+  \noindent\begin{minipage}[t]{.21\linewidth}\vspace{0pt}
+    \raggedright\color{FolioAccent}\FolioLabel{\MakeUppercase{\FolioKind}}\par
+  \end{minipage}\hfill
+  \begin{minipage}[t]{.74\linewidth}\vspace{0pt}
+    \FolioHeadline{\sffamily\bfseries}{28}{31}\FolioDeck\FolioByline
+  \end{minipage}\par\vspace{6pt}{\color{FolioRule}\hrule}}
+\FolioHeadings{\sffamily\bfseries\large}{FolioInk}

@@ -1,0 +1,10 @@
+% Blueprint | technical report with registration marks and a drafting baseline.
+\definecolor{FolioAccent}{HTML}{204D89}
+\renewcommand{\maketitle}{%
+  {\color{FolioAccent}\ttfamily\small +\enspace\MakeUppercase{\FolioKind}\hfill +\par}
+  {\color{FolioAccent}\hrule height .4pt}\vspace{10pt}
+  \FolioHeadline{\sffamily\mdseries}{32}{35}\FolioDeck
+  {\ttfamily\footnotesize\color{FolioAccent}\FolioBylineInline\par}
+  \vspace{5pt}{\color{FolioAccent}\hrule height 1pt}}
+\FolioHeadings{\ttfamily\bfseries\large}{FolioAccent}
+\fancyfoot[R]{\ttfamily\small\color{FolioAccent}[\thepage]}

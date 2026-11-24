@@ -1,0 +1,9 @@
+% Gallery | open exhibition label, large roman title, quiet folio.
+\definecolor{FolioAccent}{HTML}{633B62}
+\renewcommand{\maketitle}{%
+  {\color{FolioAccent}\rule{6pt}{6pt}\hspace{7pt}\FolioLabel{\FolioKind}}\par
+  \vspace{15pt}\FolioHeadline{\rmfamily\mdseries}{39}{41}
+  \vspace{3pt}\FolioDeck\FolioByline\vspace{8pt}}
+\FolioHeadings{\sffamily\mdseries\Large}{FolioAccent}
+\renewcommand{\footrulewidth}{0pt}
+\fancyfoot[L]{}\fancyfoot[C]{\small\sffamily\color{FolioMuted}\thepage}\fancyfoot[R]{}

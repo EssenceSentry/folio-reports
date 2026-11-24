@@ -1,0 +1,14 @@
+% Monograph | book typography and a small ornament on the center axis.
+\definecolor{FolioAccent}{HTML}{594B41}
+\FolioSerif{schola}
+\renewcommand{\maketitle}{%
+  \begin{center}
+  {\small\scshape\FolioKind}\par\vspace{7pt}
+  {\fontsize{32}{36}\selectfont\hyphenpenalty=10000\FolioTitle\par}
+  \vspace{3pt}{\large\itshape\FolioSubtitle\par}
+  \vspace{5pt}\FolioByline\vspace{3pt}
+  {\color{FolioAccent}\rule{14mm}{.5pt}}
+  \end{center}}
+\FolioHeadings{\rmfamily\mdseries\Large}{FolioInk}
+\renewcommand{\footrulewidth}{0pt}
+\fancyfoot[L]{}\fancyfoot[R]{}\fancyfoot[C]{\small\rmfamily\thepage}

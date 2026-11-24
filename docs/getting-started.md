@@ -11,6 +11,19 @@ folio-reports build transfer-study
 
 Both commands print their output path. The default output is `transfer-study/report.pdf`. To publish a copy elsewhere, pass `-o path/to/finding.pdf`. An explicit output path is relative to the shell's working directory. A failed build keeps the previous PDF.
 
+## Preview the same report in another style
+
+Run `folio-reports styles` for the names and visual descriptions. Choose a default when you create a project, or pass a temporary choice when you build.
+
+```sh
+folio-reports new research ridership --style ledger
+folio-reports build ridership --style gazette -o gazette-proof.pdf
+```
+
+The saved choice is `metadata.folio-style` in `folio.yaml`. The files in `styles/` travel with your project and can be edited directly. The most recent style layer takes precedence over the shared typography. A project created with the first version of Folio still builds using its original files. To use the new styles in such a report, generate a fresh project and copy your manuscript, figures and bibliography into it. Bring across your own layout changes selectively.
+
+For a separate title page, set `folio-cover: true` in the manuscript's YAML. Add `table-of-contents: true` to the top level of `folio.yaml` for navigation in a long report. The `specimen` starter uses a compact page for its component sheets. The other starters default to A4.
+
 ## Write for your reader
 
 For a brief, lead with the action someone can authorize. Use the large number only when you can name what it counts, its denominator, and any assumption behind it. In a research report, put the first figure beside the finding it supports. Use the following sections for the population, method, and practical limits.
@@ -29,7 +42,7 @@ Use a top-level heading for each section. Both templates paginate automatically.
 
 ## Edit the design or hand off the source
 
-The two templates share `style.tex` for body typography, table spacing, captions, and footers. `layout.tex` controls the accent, title and section styles. Both files are copied into each new report. The included TeX Gyre Pagella and Heros font settings resolve from the TeX distribution.
+The starters share `style.tex` for body typography, table spacing, captions, and footers. `layout.tex` controls the accent, title and section styles. Both files are copied into each new report. The included TeX Gyre Pagella and Heros font settings resolve from the TeX distribution.
 
 ```sh
 folio-reports build transfer-study -o transfer-study/manuscript.tex
@@ -37,7 +50,7 @@ folio-reports build transfer-study -o transfer-study/manuscript.tex
 
 The exported TeX includes the preamble, body, and formatted references. Keep its images in the same relative locations when compiling it with Tectonic. The editable report directory can also be shared in full.
 
-The research example includes the four aggregate observations in `transfers.csv`. To regenerate its vector plot, run `uv run examples/redraw.py transfer-study` from the Folio checkout. It computes the 95% Wilson intervals from the counts. The illustrative 90-second observation threshold describes a possible intervention, not an estimated treatment effect.
+The research example includes the four aggregate observations in `transfers.csv`. To regenerate its vector plot, run `uv run examples/redraw.py transfer-study` from the Folio checkout. It computes the 95% Wilson intervals from the counts. The 90-second threshold identifies visits where a hold might have helped. Estimating its effect requires a trial.
 
 ## Call Folio from Python
 

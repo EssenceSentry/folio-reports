@@ -6,5 +6,6 @@ Typeset decision briefs and research reports from Markdown.
 :maxdepth: 2
 
 getting-started
+components
 api
 ```

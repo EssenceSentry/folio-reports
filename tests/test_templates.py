@@ -22,7 +22,7 @@ def test_shipped_templates_export_latex(tmp_path: Path, layout: str) -> None:
         assert "missed-transfers.pdf" in tex
 
 
-@pytest.mark.parametrize("layout", ["brief", "research"])
+@pytest.mark.parametrize("layout", ["brief", "research", "specimen"])
 @pytest.mark.skipif(
     not all(shutil.which(tool) for tool in ("pandoc", "tectonic")),
     reason="PDF integration requires both external typesetting tools",

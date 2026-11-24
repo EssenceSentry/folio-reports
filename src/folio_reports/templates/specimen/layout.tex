@@ -1,0 +1,10 @@
+% The component specimen uses the same heading hierarchy as a short guide.
+% A short portrait specimen sheet keeps a single family visible at reading size.
+\geometry{paperwidth=190mm,paperheight=224mm,left=18mm,right=18mm,top=16mm,bottom=18mm,footskip=10mm}
+\definecolor{FolioAccent}{HTML}{06645D}
+\newcommand{\FolioKind}{Component specimen}
+\renewcommand{\maketitle}{%
+  \FolioMasthead\vspace{5pt}%
+  \FolioHeadline{\sffamily\bfseries}{33}{36}\FolioDeck\FolioByline}
+\titleformat{\section}{\sffamily\bfseries\Large\color{FolioInk}}{\thesection}{.6em}{}
+\titlespacing*{\section}{0pt}{12pt}{4pt}
