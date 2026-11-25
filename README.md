@@ -44,6 +44,8 @@ folio-reports build my-study --style blueprint -o blueprint-proof.pdf
 
 The preview uses the same manuscript and leaves the project's saved style intact. Save a choice in `folio.yaml`. Each generated project includes editable copies of all ten designs.
 
+Folio’s [typography skill](skills/typography/SKILL.md) helps you set a page or review a finished one. Use it to fit a table to its contents, compare type scales, or check what happened to the fonts, spacing and reading order in the exported PDF.
+
 ## Choose a component
 
 Create a worked example with `folio-reports new specimen my-components`. Its Markdown shows how to write a decision callout, compare two options, and place a chart beside the exact estimates and bounds. In the appendix, three changes in evening visits share one axis, so readers can see which intervals cross zero. The chart and labels stay sharp at any zoom. [Component reference](docs/components.md) · [Editable specimen](src/folio_reports/templates/specimen/report.md)

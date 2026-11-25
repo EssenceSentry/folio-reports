@@ -1,0 +1,4 @@
+interface:
+  display_name: "Typography"
+  short_description: "Set and proof type for reports, pages, and screens"
+  default_prompt: "Use $typography to review this report at reading size and show the most consequential fixes."
