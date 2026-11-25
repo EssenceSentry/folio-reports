@@ -69,8 +69,8 @@ end
 
 local panels = {
   summary={"wash","Executive summary"}, finding={"rail","Finding"},
-  recommendation={"wash","Recommendation"}, decision={"rail","Decision"},
-  limitation={"caution","Limitation"}, risk={"caution","Risk"},
+  recommendation={"recommendation","Recommendation"}, decision={"decision","Decision"},
+  limitation={"caution","Limitation"}, risk={"risk","Risk"},
   note={"line","Note"}, assumption={"line","Assumption"},
   method={"rail","Method"}, definition={"line","Definition"},
 }
@@ -84,6 +84,26 @@ local function comparison(div)
     append(parts, environment("FolioColumn", {text(required(col,"title"))}, col.content))
   end
   return environment("FolioColumns", {}, parts)
+end
+
+local uses_reading_columns = false
+
+local function reading_columns(div)
+  uses_reading_columns = true
+  return environment("FolioReadingColumns", {}, div.content)
+end
+
+local function metric_rail(div)
+  if #div.content < 2 then error(".metric-rail needs a .rail followed by narrative blocks") end
+  local rail = div.content[1]
+  if rail.t ~= "Div" or not rail.classes:includes("rail") or #rail.content == 0 then
+    error(".metric-rail must begin with a nonempty .rail")
+  end
+  local parts = {}
+  append(parts, rail.content)
+  table.insert(parts, latex("\\FolioRailNarrative"))
+  for i = 2, #div.content do table.insert(parts, div.content[i]) end
+  return environment("FolioMetricRail", {}, parts)
 end
 
 local function trend(div)
@@ -274,11 +294,21 @@ end
 
 local handlers = {
   ["table-layout"]=table_layout,
+  ["reading-columns"]=reading_columns,
+  ["keep-together"]=function(d) return environment("samepage", {}, d.content) end,
+  ["metric-rail"]=metric_rail,
+  exhibit=function(d)
+    return environment("FolioExhibit",
+      {text(d.attributes.label or "Exhibit"),text(required(d,"title")),text(d.attributes.units or "")},
+      d.content)
+  end,
+  ["data-page"]=function(d) return environment("FolioDataPage", {}, d.content) end,
   scorecard=scorecard, flow=flow, intervalplot=intervalplot, heatmap=heatmap, distribution=distribution,
   appendix=function(d) empty_body(d); return latex("\\clearpage\\appendix\\setcounter{secnumdepth}{1}") end,
   metric=function(d) return environment("FolioMetric", {text(required(d,"value"))}, d.content) end,
   pullquote=function(d) return environment("FolioQuote", {text(d.attributes.by or "")}, d.content) end,
   source=function(d) return environment("FolioSource", {}, d.content) end,
+  prose=function(d) return environment("FolioProse", {}, d.content) end,
   milestone=function(d) return environment("FolioEntry", {text(required(d,"when"))}, d.content) end,
   action=function(d) return environment("FolioEntry", {text(required(d,"owner"))}, d.content) end,
   signature=function(d) return environment("FolioSignature", {text(required(d,"name"))}, d.content) end,
@@ -314,7 +344,25 @@ function Span(s)
   return result
 end
 
+local function reference_link(link)
+  if pandoc.utils.stringify(link.content) ~= link.target then return end
+  local doi = link.target:match("^https?://doi%.org/(.+)$")
+  local pmid = link.target:match("^https?://pubmed%.ncbi%.nlm%.nih%.gov/(%d+)/?$")
+  if doi then link.content = {text("DOI"), pandoc.Space(), text(doi)}
+  elseif pmid then link.content = {text("PubMed"), pandoc.Space(), text(pmid)}
+  else return end
+  return {pandoc.LineBreak(), raw("\\hspace*{1.5em}"), link}
+end
+
+function Header(header)
+  -- Reserve space before Pandoc writes the section's link destination.
+  if header.level == 1 then return {latex("\\FolioBeforeSection"), header} end
+end
+
 function Div(div)
+  if div.classes:includes("csl-entry") then
+    return pandoc.walk_block(div, {Link=reference_link})
+  end
   for _, class in ipairs(div.classes) do
     if panels[class] then
       local spec=panels[class]
@@ -333,11 +381,15 @@ local function read_tex(path)
 end
 
 function Meta(meta)
-  local style=pandoc.utils.stringify(meta["folio-style-preview"] or meta["folio-style"] or "classic")
-  if not style:match("^[a-z][a-z0-9-]*$") then error("Invalid folio-style name") end
   local preamble = pandoc.MetaBlocks({read_tex("style.tex"),read_tex("layout.tex"),
-    read_tex("components.tex"),read_tex("styles/" .. style .. ".tex")})
-  if meta["folio-cover"] == true or pandoc.utils.stringify(meta["folio-cover"] or "") == "true" then
+    read_tex("components.tex")})
+  if uses_reading_columns then table.insert(preamble, latex("\\usepackage{multicol}")) end
+  local cover = pandoc.utils.stringify(meta["folio-cover-image"] or "")
+  if cover ~= "" then
+    table.insert(preamble, pandoc.Plain({raw("\\newcommand{\\FolioCoverArt}{"),
+      pandoc.Image({}, cover), raw("}")}))
+    table.insert(preamble, latex("\\renewcommand{\\maketitle}{\\FolioImageCover}"))
+  elseif meta["folio-cover"] == true or pandoc.utils.stringify(meta["folio-cover"] or "") == "true" then
     table.insert(preamble,latex("\\let\\FolioInnerTitle\\maketitle\\renewcommand{\\maketitle}{\\thispagestyle{empty}\\vspace*{.16\\textheight}\\FolioInnerTitle\\clearpage}"))
   end
   local includes=meta["header-includes"]

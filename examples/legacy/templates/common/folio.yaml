@@ -1,0 +1,22 @@
+from: markdown
+to: latex
+standalone: true
+pdf-engine: tectonic
+filters:
+  - citeproc
+  - blocks.lua
+metadata:
+  folio-style: classic
+variables:
+  documentclass: article
+  papersize: a4
+  fontsize: 11pt
+  geometry:
+    - left=31mm
+    - right=38mm
+    - top=23mm
+    - bottom=27mm
+    - footskip=13mm
+  colorlinks: true
+  urlcolor: FolioAccent
+  linkcolor: black

@@ -1,0 +1,23 @@
+% An editorial report with text columns, full-width evidence and a quiet footer.
+\usepackage{geometry}
+\geometry{paperwidth=612bp,paperheight=792bp,left=59bp,right=52bp,top=57bp,bottom=66bp,footskip=28bp}
+\definecolor{FolioAccent}{HTML}{2E559C}
+\definecolor{FolioInk}{HTML}{1A2636}
+\definecolor{FolioMuted}{HTML}{46566D}
+\definecolor{FolioRule}{HTML}{A8B5C7}
+\newcommand{\FolioKind}{Outlook report}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\maketitle}{\FolioJournalTitle{47}{48}}
+\AtBeginDocument{%
+  \fontsize{10.5}{14}\selectfont\RaggedRight
+  \setlength{\skip\footins}{23pt plus 3pt minus 3pt}}
+\def\footnoterule{%
+  \kern-3pt{\color{FolioRule}\hrule width\textwidth height .45pt}\kern6pt}
+\titleformat{\section}{\FolioDisplay\fontsize{31}{33}\selectfont\color{FolioInk}}%
+  {\thesection}{.6em}{\FolioTitleRaggedRight}
+\titlespacing*{\section}{0pt}{22pt}{10pt}
+% A two-line section heading needs room for a possible subheading and opening text.
+\newcommand{\FolioBeforeSection}{\Needspace{10\baselineskip}}
+\titleformat{\subsection}{\FolioDisplay\fontsize{16}{19}\selectfont\color{FolioInk}}%
+  {\thesubsection}{.65em}{\raggedright}
+\titlespacing*{\subsection}{0pt}{12pt}{4pt}

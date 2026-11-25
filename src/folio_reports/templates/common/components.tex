@@ -1,6 +1,7 @@
 % Shared primitives used by the visual styles.
 \usepackage{needspace,tikz,tcolorbox,tabularx,longtable,colortbl,booktabs}
 \tcbuselibrary{breakable,skins}
+\AtBeginEnvironment{CSLReferences}{\RaggedRight}
 \newcommand{\FolioSerif}[1]{\setmainfont{texgyre#1-regular.otf}[
   BoldFont=texgyre#1-bold.otf,ItalicFont=texgyre#1-italic.otf,
   BoldItalicFont=texgyre#1-bolditalic.otf]}
@@ -13,7 +14,95 @@
 \makeatother
 \newcommand{\FolioHeadings}[2]{%
   \titleformat{\section}{#1\color{#2}}{\thesection}{.65em}{\FolioTitleRaggedRight}
-  \titlespacing*{\section}{0pt}{12pt}{3pt}}
+  \titlespacing*{\section}{0pt}{\FolioSpaceSection}{5pt}}
+% A shorter reading measure alongside full-width displays.
+\providecommand{\FolioProseInset}{.15\linewidth}
+\newenvironment{FolioProse}{\par\advance\rightskip by \FolioProseInset\relax}{\par}
+\providecommand{\FolioBeforeSection}{}
+% Editorial page components can share the same report grid.
+\definecolor{FolioDataPaper}{HTML}{12243A}
+\DeclareCaptionFont{foliomuted}{\color{FolioMuted}}
+\newcommand{\FolioBarTrack}{FolioRule!55!white}
+\newsavebox{\FolioCoverBox}
+\newcommand{\FolioImageCover}{%
+  \thispagestyle{empty}%
+  \sbox{\FolioCoverBox}{\resizebox{\paperwidth}{!}{\FolioCoverArt}}%
+  \noindent\begin{tikzpicture}[remember picture,overlay]
+    \clip (current page.south west) rectangle (current page.north east);
+    \node[inner sep=0pt] at (current page.center) {%
+      \ifdim\ht\FolioCoverBox<\paperheight
+        \resizebox{!}{\paperheight}{\usebox{\FolioCoverBox}}%
+      \else\usebox{\FolioCoverBox}\fi};
+    \fill[FolioDataPaper,opacity=.22] (current page.south west) rectangle (current page.north east);
+  \end{tikzpicture}\par
+  \begingroup\color{white}\vspace*{13mm}%
+  {\sffamily\bfseries\addfontfeatures{LetterSpace=7}\FolioAuthor\par}%
+  \vspace{14pt}\FolioHeadline{\FolioDisplay}{51}{52}%
+  \ifx\FolioSubtitle\empty\else
+    \vspace{10pt}{\sffamily\fontsize{15}{20}\selectfont
+      \raggedright\advance\rightskip by .20\linewidth\FolioSubtitle\par}%
+  \fi
+  \vfill{\sffamily\small\FolioDate\par}%
+  \endgroup\clearpage}
+\newlength{\FolioColumnGap}
+\setlength{\FolioColumnGap}{18pt}
+\newenvironment{FolioReadingColumns}{%
+  \setlength{\columnsep}{\FolioColumnGap}\setlength{\multicolsep}{6pt plus 2pt minus 1pt}%
+  \setlength{\maxbalancingoverflow}{0pt}%
+  \begin{multicols}{2}\raggedcolumns\RaggedRight
+}{\end{multicols}}
+\newenvironment{FolioNarrowProse}{%
+  \par\addvspace{\FolioSpaceSmall}\noindent
+  \begin{minipage}{\dimexpr(\linewidth-\FolioColumnGap)/2\relax}\RaggedRight
+}{\end{minipage}\par\addvspace{\FolioSpaceSmall}}
+\newcommand{\FolioAnchorFigures}{%
+  \renewenvironment{figure}[1][]{\par\noindent\begin{minipage}{\linewidth}%
+    \captionsetup{type=figure}}{\end{minipage}\par}%
+}
+\newenvironment{FolioInlineFigure}{%
+  \par\addvspace{\FolioSpaceBlock}\FolioAnchorFigures
+}{\par\addvspace{\FolioSpaceBlock}}
+\newenvironment{FolioMetricRail}{%
+  \par\addvspace{\FolioSpaceBlock}\noindent
+  \begin{minipage}[t]{.25\linewidth}\vspace{0pt}%
+  \RaggedRight
+  \renewenvironment{FolioMetric}[1]{%
+    \par\addvspace{\FolioSpaceBlock}\noindent
+    {\color{FolioAccent}\FolioMetricFace\fontsize{35}{37}\selectfont ##1\par}\nobreak
+    \small
+  }{\par}
+}{\end{minipage}\par\addvspace{\FolioSpaceBlock}}
+\newcommand{\FolioRailNarrative}{%
+  \end{minipage}\hfill\begin{minipage}[t]{.71\linewidth}\vspace{0pt}}
+\newenvironment{FolioExhibit}[3]{%
+  \par\Needspace{6\baselineskip}\addvspace{\FolioSpaceSection}%
+  {\color{FolioAccent}\FolioLabel{#1}\par}\nobreak\smallskip
+  {\sffamily\bfseries\fontsize{16}{19}\selectfont\RaggedRight #2\par}\nobreak
+  \if\relax\detokenize{#3}\relax\else
+    \smallskip{\small\sffamily\color{FolioMuted}#3\par}\nobreak
+  \fi
+  \FolioAnchorFigures
+}{\par\addvspace{\FolioSpaceBlock}}
+\fancypagestyle{folioData}{%
+  \fancyhf{}%
+  \fancyfoot[L]{\sffamily\footnotesize\color{FolioMuted}\FolioKind}%
+  \fancyfoot[R]{\sffamily\footnotesize\color{FolioInk}\thepage}}
+\newenvironment{FolioDataPage}{%
+  \clearpage\pagecolor{FolioDataPaper}\pagestyle{folioData}%
+  \definecolor{FolioInk}{HTML}{F5F7FC}%
+  \definecolor{FolioMuted}{HTML}{B9CBE0}%
+  \definecolor{FolioAccent}{HTML}{8FB9FF}%
+  \definecolor{FolioRule}{HTML}{6C8099}%
+  \renewcommand{\FolioBarTrack}{FolioRule!48!FolioDataPaper}%
+  \color{FolioInk}\arrayrulecolor{FolioRule}%
+  \captionsetup{textfont=foliomuted}%
+  \hypersetup{linkcolor=FolioAccent,urlcolor=FolioAccent,citecolor=FolioAccent}%
+  \tcbset{folio rail/.append style={colback=FolioDataPaper},
+    folio line/.append style={colback=FolioDataPaper},
+    folio caution/.append style={colback=FolioInk!10!FolioDataPaper},
+    folio wash/.append style={colback=FolioInk!8!FolioDataPaper},
+    folio recommendation/.append style={colback=FolioAccent!13!FolioDataPaper}}%
+}{\clearpage\nopagecolor\pagestyle{fancy}}
 % Native Markdown longtables keep their notes and numbers on the same grid.
 \newcommand{\FolioTableFace}{\sffamily}
 \newenvironment{FolioTable}[1]{\par\addvspace{6pt}\begingroup
@@ -31,39 +120,45 @@
 % Long callouts break with the page. A short label stays with its first line.
 \tcbset{folio base/.style={enhanced,breakable,frame hidden,sharp corners,
   boxrule=0pt,left=9pt,right=9pt,top=5pt,bottom=5pt,
-  before skip=6pt,after skip=6pt,coltext=FolioInk},
-  folio wash/.style={colback=FolioAccent!7!white},
+  before skip=\FolioSpaceBlock,after skip=\FolioSpaceSmall,coltext=FolioInk},
+  folio wash/.style={colback=FolioAccent!5!white},
+  folio recommendation/.style={colback=FolioAccent!10!white,
+    borderline west={1.5pt}{0pt}{FolioAccent}},
   folio rail/.style={colback=white,borderline west={1.5pt}{0pt}{FolioAccent}},
+  folio decision/.style={folio rail,before skip=0pt},
   folio caution/.style={colback=black!3!white,borderline west={2pt}{0pt}{FolioInk}},
+  folio risk/.style={folio caution,before skip=21pt},
   folio line/.style={colback=white,borderline north={.55pt}{0pt}{FolioRule}}}
 \newenvironment{FolioPanel}[2]{\begin{tcolorbox}[folio base,folio #1]
   {\FolioLabel{\textcolor{FolioAccent}{#2}}}\par\smallskip\ignorespaces}{\end{tcolorbox}}
 \newenvironment{FolioQuote}[1]{%
-  \def\FolioAttribution{#1}\begin{list}{}{\leftmargin=1.6em\rightmargin=1.3em}
+  \def\FolioAttribution{#1}\begin{list}{}{\leftmargin=1.6em\rightmargin=3.6em}
   \item[]\color{FolioAccent}\large\itshape\raggedright\ignorespaces
 }{\par\ifx\FolioAttribution\empty\else
   \smallskip{\normalfont\small\sffamily\color{FolioMuted}\FolioAttribution\par}\fi\end{list}}
-\newenvironment{FolioSource}{\par\smallskip\begingroup\small\sffamily\color{FolioMuted}\raggedright
-  \ignorespaces}{\par\endgroup\smallskip}
+\newenvironment{FolioSource}{\par\addvspace{\FolioSpaceSmall}\begingroup
+  \small\sffamily\color{FolioMuted}\raggedright\noindent\ignorespaces}%
+  {\par\endgroup\addvspace{\FolioSpaceSmall}}
 \newenvironment{FolioEntry}[1]{%
   \Needspace{2.8\baselineskip}\par\addvspace{5pt}{\color{FolioRule}\hrule}\smallskip
   {\FolioLabel{\textcolor{FolioAccent}{#1}}}\par\nobreak\ignorespaces}{\par}
 \newenvironment{FolioColumns}{\par\addvspace{7pt}\noindent
-  \begin{tabular}{@{}p{.475\linewidth}@{\hspace{.05\linewidth}}p{.475\linewidth}@{}}}
-  {\end{tabular}\par\addvspace{7pt}}
+  \begin{tabular}[b]{@{}p{.475\linewidth}@{\hspace{.05\linewidth}}p{.475\linewidth}@{}}}
+  {\end{tabular}\par\nointerlineskip}
 \newenvironment{FolioColumn}[1]{%
   {\color{FolioAccent}\hrule height 1.4pt}\smallskip
   \FolioLabel{#1}\par\smallskip\RaggedRight\ignorespaces}{\par}
 \newenvironment{FolioCheck}[1]{\par\begin{list}{#1}{\leftmargin=1.7em\topsep=2pt
   \itemsep=0pt\parsep=0pt}\item\ignorespaces}{\end{list}}
 \newenvironment{FolioSignature}[1]{\par\addvspace{12pt}
+  \Needspace{4\baselineskip}\vspace{\FolioSpaceSmall}% room above the signature line
   {\color{FolioRule}\rule{.43\linewidth}{.55pt}}\par
   \FolioLabel{#1}\par\nobreak\small\ignorespaces}{\par}
-\newcommand{\FolioDivider}[1]{\par\addvspace{8pt}\Needspace{3\baselineskip}
-  {\color{FolioRule}\hrule}\smallskip{\FolioLabel{\textcolor{FolioMuted}{#1}}}\par}
-\newenvironment{FolioCells}[2]{\par\addvspace{7pt}\noindent
-  \begin{tabular}{@{}*{\number\numexpr#1-1\relax}{p{#2\linewidth}@{\hspace{.04\linewidth}}}p{#2\linewidth}@{}}}
-  {\end{tabular}\par\addvspace{7pt}}
+\newcommand{\FolioDivider}[1]{\par\Needspace{4\baselineskip}\addvspace{\FolioSpaceSection}%
+  {\sffamily\bfseries\large\color{FolioInk}#1\par}\nobreak}
+\newenvironment{FolioCells}[2]{\par\addvspace{\FolioSpaceSmall}\noindent
+  \begin{tabular}[b]{@{}*{\number\numexpr#1-1\relax}{p{#2\linewidth}@{\hspace{.04\linewidth}}}p{#2\linewidth}@{}}}
+  {\end{tabular}\par\nointerlineskip\addvspace{\FolioSpaceSmall}}
 \newenvironment{FolioMeasure}[2]{\raggedright{\color{FolioRule}\hrule}\smallskip
   {\sffamily\bfseries\Large\color{FolioAccent}#1\par}\FolioLabel{#2}\par
   \footnotesize\ignorespaces}{\par}
@@ -81,14 +176,16 @@
     \draw[FolioAccent,line width=1.4pt] (#7,1)--(#7,13);
     \node[anchor=north west,inner xsep=0pt,font=\scriptsize\sffamily] at (0,-1) {#3};
     \node[anchor=north east,inner xsep=0pt,font=\scriptsize\sffamily] at (1,-1) {#4};
-  \end{tikzpicture}\end{minipage}\par}
+  \end{tikzpicture}\end{minipage}\par\addvspace{\FolioSpaceSmall}}
 % Coordinates are normalized by the Lua filter. Original units stay in selectable text.
-\newcommand{\FolioBar}[3]{\par\Needspace{2.4\baselineskip}
+\newcommand{\FolioBar}[3]{\par\Needspace{2.4\baselineskip}\addvspace{\FolioSpaceSmall}%
+  \noindent\begin{minipage}{\linewidth}\setlength{\parskip}{0pt}%
   {\small\sffamily #1\hfill\textbf{#2}}\par\nobreak
-  \noindent\begin{tikzpicture}[x=.997\linewidth,y=1pt]
-    \fill[FolioRule!55!white] (0,0) rectangle (1,3);
+  \nointerlineskip\vspace{4pt}%
+  \hbox{\begin{tikzpicture}[x=.997\linewidth,y=1pt]
+    \fill[\FolioBarTrack] (0,0) rectangle (1,3);
     \fill[FolioAccent] (0,0) rectangle (#3,3);
-  \end{tikzpicture}\par}
+  \end{tikzpicture}}\end{minipage}\par}
 \newcommand{\FolioInterval}[5]{\par\Needspace{2.4\baselineskip}
   {\small\sffamily #1\hfill #2}\par\nobreak
   \noindent\begin{tikzpicture}[x=.997\linewidth,y=1pt]

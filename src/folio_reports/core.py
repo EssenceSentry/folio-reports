@@ -3,24 +3,12 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-LAYOUTS = ("brief", "research", "specimen")
-STYLES = {
-    "classic": "An editorial journal with Garamond display type and Source Serif text.",
-    "swiss": "A two-column opening with condensed IBM Plex and flush-left text.",
-    "gazette": "A centered newspaper masthead and double rules.",
-    "blueprint": "Cobalt drafting marks and monospaced annotations.",
-    "fieldnotes": "Olive field-journal typography and an inset title.",
-    "ledger": "A compact financial statement with ruled section labels.",
-    "gallery": "Aubergine exhibition typography with generous open space.",
-    "signal": "A high-contrast banner for operational decisions.",
-    "monograph": "A centered Garamond book opening, small capitals and indented prose.",
-    "dispatch": "A navy correspondence header and a split title block.",
-}
 _TEMPLATES = Path(__file__).with_name("templates")
 
 
@@ -38,10 +26,8 @@ def _blank_manuscript(title: str | None, author: str | None) -> str:
 
 
 def new(
-    layout: str,
     directory: Path,
     *,
-    style: str = "classic",
     blank: bool = False,
     title: str | None = None,
     author: str | None = None,
@@ -50,12 +36,8 @@ def new(
 
     Parameters
     ----------
-    layout : str
-        A brief, research report or component specimen.
     directory : Path
         New project directory. An existing directory is never reused.
-    style : str
-        Persistent visual style for the project.
     blank : bool
         Start with a title and an empty manuscript body. Omit example assets.
     title : str or None
@@ -70,12 +52,6 @@ def new(
     Path
         Absolute path to the project.
     """
-    if layout not in LAYOUTS:
-        raise ValueError(
-            f"Unknown layout {layout!r}. Choose from {', '.join(LAYOUTS)}."
-        )
-    if style not in STYLES:
-        raise ValueError(f"Unknown style {style!r}. Choose from {', '.join(STYLES)}.")
     directory = directory.absolute()
     if directory.exists() or directory.is_symlink():
         raise FileExistsError(f"Destination already exists: {directory}")
@@ -84,18 +60,12 @@ def new(
         staged = Path(temporary) / "project"
         shutil.copytree(_TEMPLATES / "common", staged)
         if blank or title is not None or author is not None:
-            shutil.copy2(_TEMPLATES / layout / "layout.tex", staged)
+            shutil.copy2(_TEMPLATES / "outlook" / "layout.tex", staged)
             (staged / "report.md").write_text(
                 _blank_manuscript(title, author), encoding="utf-8"
             )
         else:
-            shutil.copytree(_TEMPLATES / layout, staged, dirs_exist_ok=True)
-        defaults = staged / "folio.yaml"
-        defaults.write_text(
-            defaults.read_text().replace(
-                "folio-style: classic", f"folio-style: {style}"
-            )
-        )
+            shutil.copytree(_TEMPLATES / "outlook", staged, dirs_exist_ok=True)
         # A reader sees the entire report at once. Concurrent generators publish
         # nonempty directories, so a later rename cannot overwrite a winner.
         staged.rename(directory)
@@ -115,7 +85,7 @@ def build(
         Output PDF or TeX file. Defaults to report.pdf beside the source.
         An explicit relative path resolves from the caller's working directory.
     style : str or None
-        Override the project style for this build only.
+        Preview a style from an older project's local styles directory.
 
     Returns
     -------
@@ -127,7 +97,8 @@ def build(
         if not (project / required).is_file():
             raise FileNotFoundError(f"Missing {required} in {project}")
     if style is not None and (
-        style not in STYLES or not (project / "styles" / f"{style}.tex").is_file()
+        re.fullmatch(r"[a-z][a-z0-9-]*", style) is None
+        or not (project / "styles" / f"{style}.tex").is_file()
     ):
         raise ValueError(
             f"Style {style!r} is unavailable in this project's styles directory."

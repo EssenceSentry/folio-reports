@@ -14,6 +14,9 @@
 \definecolor{FolioInk}{HTML}{201F1C}
 \definecolor{FolioMuted}{HTML}{53544D}
 \definecolor{FolioRule}{HTML}{BDBBB2}
+\newcommand{\FolioSpaceSmall}{6pt}
+\newcommand{\FolioSpaceBlock}{12pt}
+\newcommand{\FolioSpaceSection}{18pt}
 \newcommand{\FolioSubtitle}{}
 \providecommand{\subtitle}[1]{\renewcommand{\FolioSubtitle}{#1}}
 \newcommand{\FolioLabel}[1]{{\sffamily\bfseries\fontsize{8.5}{11}\selectfont #1}}
@@ -26,6 +29,9 @@
 \newcommand{\FolioTitleRaggedRight}{%
   \raggedright\rightskip=0pt plus 1\linewidth\FolioTitleSpacing}
 \makeatletter
+\renewcommand{\@makefntext}[1]{%
+  \parindent=0pt\noindent\hangindent=1.2em\hangafter=1%
+  \makebox[1.2em][l]{\@makefnmark}#1}
 \newcommand{\FolioByline}{%
   {\sffamily\fontsize{9.5}{12}\selectfont\color{FolioMuted}\def\and{, }%
    \@author\ifx\@date\@empty\else\ifx\@author\@empty\else\enspace·\enspace\fi\@date\fi\par}}
@@ -41,7 +47,9 @@
 \fancyfoot[L]{\sffamily\footnotesize\color{FolioMuted}\FolioKind}
 \fancyfoot[R]{\sffamily\footnotesize\color{FolioInk}\thepage}
 \setlength{\parindent}{0pt}
-\AtBeginDocument{\color{FolioInk}\setlength{\parskip}{5pt plus 1pt minus 1pt}}
+\AtBeginDocument{%
+  \setlength{\headwidth}{\textwidth}% honor the starter's page geometry
+  \color{FolioInk}\setlength{\parskip}{5pt plus 1pt minus 1pt}}
 \raggedbottom
 \widowpenalty=9000 \clubpenalty=9000
 \doublehyphendemerits=60000 \finalhyphendemerits=100000
@@ -52,7 +60,7 @@
 \AtBeginDocument{\ifdefined\LTleft\setlength{\LTleft}{0pt}\fi}
 \DeclareCaptionFont{folioaccent}{\color{FolioAccent}}
 \captionsetup{font={small,sf},labelfont={bf,folioaccent},labelsep=quad,
-  justification=raggedright,singlelinecheck=false,skip=7pt}
+  format=hang,justification=raggedright,singlelinecheck=false,skip=\FolioSpaceSmall}
 \newcommand{\FolioMasthead}{%
   {\sffamily\fontsize{9}{11}\selectfont\color{FolioAccent}%
    {\bfseries\addfontfeatures{LetterSpace=9}\MakeUppercase{\FolioKind}}%
@@ -64,7 +72,7 @@
 \newcommand{\FolioJournalTitle}[2]{%
   \FolioMasthead\vspace{12pt}%
   \FolioHeadline{\FolioDisplay}{#1}{#2}\vspace{5pt}%
-  \FolioDeck\vspace{5pt}\FolioCredit\vspace{9pt}}
+  \FolioDeck\vspace{5pt}\FolioCredit\addvspace{\FolioSpaceSmall}}
 \newcommand{\FolioMetricFace}{\FolioDisplay}
 % Keep a short figure prominent and scale a wider value to its column.
 \newsavebox{\FolioMetricBox}
@@ -79,4 +87,4 @@
   \end{minipage}\hfill\begin{minipage}[c]{.76\linewidth}\RaggedRight
 }{\end{minipage}\par\vspace{6pt}{\color{FolioRule}\hrule height .45pt}\end{minipage}\par\addvspace{5pt}}
 \titleformat{\subsection}{\sffamily\bfseries\normalsize\color{FolioInk}}{\thesubsection}{.65em}{}
-\titlespacing*{\subsection}{0pt}{10pt}{3pt}
+\titlespacing*{\subsection}{0pt}{\FolioSpaceBlock}{4pt}

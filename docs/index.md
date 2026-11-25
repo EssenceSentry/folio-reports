@@ -1,6 +1,6 @@
 # Folio Reports
 
-Typeset decision briefs and research reports from Markdown.
+Typeset Markdown reports with two-column prose and full-width evidence.
 
 ```{toctree}
 :maxdepth: 2

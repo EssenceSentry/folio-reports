@@ -1,14 +1,14 @@
 ---
 title: Test a 90-second transfer hold
-subtitle: A two-week pilot for the 08:10 connector at Alder Junction
+subtitle: A two-week pilot at Alder Junction for the 08:10 connector
 author: Service Planning
 date: 24 November 2026
 ---
 
-A late feeder bus can cost a rider half an hour at Alder Junction. Give dispatchers permission to hold the 08:10 connector for up to 90 seconds, on alternating weekdays, when a connecting rider is visibly approaching.
+A late feeder bus can cost a rider half an hour at Alder Junction. On alternating weekdays, let dispatchers hold the 08:10 connector for up to 90 seconds when they see a rider approaching from the feeder.
 
 ::: {.metric value="18"}
-**Potentially recoverable transfers** among the 100 rider connections observed at 08:10. These riders reached the stop within 90 seconds after departure.
+**Potentially recoverable transfers** out of 100 connection attempts at 08:10. These riders reached the stop within 90 seconds after departure.
 :::
 
 # Why this departure?
@@ -29,6 +29,8 @@ Across four morning departures, 60 of 400 observed connections failed. The 08:10
 
 # What would justify keeping it?
 
-Keep the hold if the waiting time saved by connecting riders exceeds the delay added for riders already on board. If the difference is unclear, use the pilot logs to decide whether another week is worthwhile.
+Keep the hold if it saves connecting riders more time than it costs riders already on board. If the difference is unclear, use the pilot logs to decide whether to extend the trial by one week.
 
-*Illustrative case. All counts, the stop and the timetable are synthetic.*
+::: {.source}
+Illustrative case. All counts, the stop and the timetable are synthetic.
+:::

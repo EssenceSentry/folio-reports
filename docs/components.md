@@ -1,6 +1,6 @@
 # Report components
 
-To start with a working example, run `folio-reports new specimen my-components`. Open the generated `report.md` beside its PDF. Every entry below works in a brief, research report or specimen, in any of the ten styles.
+Run `folio-reports new worked-example` to see the components in a complete model evaluation. Open the generated `report.md` beside its PDF.
 
 ## Findings and decisions
 
@@ -27,7 +27,7 @@ Of 200 recorded visits, **72 began after 18:00**.
 
 ## Tables and their notes
 
-Use an ordinary Markdown table for a small comparison at its natural width. Wrap it in `.table-layout` to choose its measure. The brief gives four parts of the width to the decision text for every one part given to its label. The research report groups its four columns and explanatory note within seven eighths of the reading column.
+Ordinary Markdown tables span the text area. Wrap a table in `.table-layout` to set the relative column widths and choose the overall measure. An accompanying note shares that measure.
 
 ````markdown
 ::: {.table-layout widths="2,1,1" width="75%"}
@@ -42,6 +42,8 @@ Counts refer to riders attempting a transfer.
 ````
 
 Give one positive weight per column. The optional `width` is a percentage of the available line, defaulting to 100%. Markdown controls the alignment of each column. A paragraph below the table becomes a smaller note with the same left and right boundaries. The native table can still carry a caption and continue across pages with repeated headers.
+
+Use `.prose` for commentary next to full-width charts or tables. It gives ordinary Markdown paragraphs a shorter, left-aligned reading measure.
 
 ## Numbers, comparisons and charts
 
@@ -111,6 +113,7 @@ Use attribute-only blocks for bars, intervals, trends, distribution plots and he
 | Feature | How to use it |
 |---|---|
 | Separate cover | Add `folio-cover: true` to the manuscript's YAML along with title, author, date and optional subtitle |
+| Illustrated cover | Set `folio-cover-image: cover.jpg` with a project-relative path to the artwork. The title and byline remain selectable text |
 | Contents | Add `table-of-contents: true` to `folio.yaml` |
 | Scene or section divider | Empty `.divider` block with `title="Pilot calendar"` |
 | Controlled page turn | Empty `.pagebreak` block. Regular prose and callouts can flow across pages |
@@ -120,6 +123,19 @@ Use attribute-only blocks for bars, intervals, trends, distribution plots and he
 | Equations and code | Use dollar-delimited inline or display math and fenced code with a language name |
 | Footnotes and references | Use Markdown footnotes, a BibTeX file in `bibliography`, and citations such as `[@wilson1927]` |
 
+## Editorial pages
+
+| Block | Use it for |
+|---|---|
+| `.reading-columns` | Set a two-column block inside a custom component. Ordinary prose already flows in columns |
+| `.full-width` | Place an explicit block across both reading columns |
+| `.keep-together` | Keep a short list and its lead-in, or a short group of related paragraphs, on one page |
+| `.metric-rail` | Put a nested `.rail` block containing `.metric` blocks before the narrative. Keep this comparison short enough to fit on one page |
+| `.exhibit` | Group a headline, units, and evidence. Set `title="..."` and optionally `label="Exhibit 1"` and `units="..."`. A full-width table can carry a note beneath it |
+| `.data-page` | Give diagnostics or a group of charts dedicated navy pages. A page break restores the regular palette when the block ends |
+
+The Outlook manuscript shows the nesting and page breaks used in the worked example.
+
 ## Rebuild the visual catalog
 
-From the checkout, run `uv run --with-editable . --script examples/build_catalog.py`. The command builds the brief, research report and specimen, then typesets the same brief in all ten styles for the bookmarked lookbook. The page spreads and masthead preview come from those PDFs. The authoring CLI needs Pandoc and Tectonic. The catalog script also uses Poppler's `pdftoppm` and installs its own Python image and PDF dependencies through uv.
+From the checkout, run `uv run --with-editable . --script examples/build_catalog.py` to rebuild the model evaluation PDF and its page images. The authoring CLI needs Pandoc and Tectonic. The page images also use Poppler's `pdftoppm`.

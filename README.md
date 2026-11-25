@@ -1,60 +1,39 @@
 # Folio Reports
 
-Write the finding in Markdown. Give the person reading it a PDF they can take into a meeting, annotate, or print. Folio supplies the typography, figure captions, tables, and page furniture. You own the text and the LaTeX in each project.
+Write in Markdown and publish an editorial PDF with two-column prose, full-width evidence, and an optional illustrated cover. Each report includes its own editable LaTeX and build settings.
 
-[Open the one-page decision brief](examples/decision-brief.pdf) · [Read the two-page research report](examples/research-report.pdf) · [Explore the component specimen](examples/component-specimen.pdf)
+## Make a report
 
-![A one-page decision brief beside a research report showing the supporting figure, data and methods.](examples/report-previews.webp)
-
-## Choose a starting point
-
-| If your reader needs to… | Start with |
-|---|---|
-| Approve a change, understand its size, and know who acts next | **Brief.** An editorial headline, a prominent metric, and a short action table. |
-| Inspect a result, follow the method, and judge its limits | **Research.** Numbered sections, vector figures, equations, and a bibliography. |
-| Find a component and copy a working example | **Specimen.** A six-page pilot report with scorecards, charts, a comparison, a workflow, methods, and an appendix. |
-
-The brief and research examples use the same synthetic transit observations. The brief proposes a 90-second hold. The report shows why a particular departure warrants a trial and what the counts can establish.
-
-## Make your first report
-
-Install [Pandoc](https://pandoc.org/installing.html) and [Tectonic](https://tectonic-typesetting.github.io/). With Python 3.12 or newer and uv, install Folio directly from GitHub.
+Install [Pandoc](https://pandoc.org/installing.html) and [Tectonic](https://tectonic-typesetting.github.io/). With Python 3.12 or newer and uv, install Folio from GitHub.
 
 ```sh
 uv tool install git+https://github.com/EssenceSentry/folio-reports.git
-folio-reports new brief my-brief --title "Autumn service review" --author "Planning team"
-folio-reports build my-brief
+folio-reports new model-review --title "Evaluation under a review budget" --author "Model Evaluation"
+folio-reports build model-review
 ```
 
-Open `my-brief/report.pdf` for a proof of the title and byline. Write below the metadata in `my-brief/report.md` and rebuild. To explore a finished example first, run `folio-reports new brief worked-example`. Tectonic downloads its TeX packages on the first build.
+Write below the metadata in `model-review/report.md` and rebuild. Run `folio-reports new worked-example` to start from the complete sample. Tectonic downloads its TeX packages on the first build.
 
-## Choose a visual style
+Use ordinary Markdown for prose, tables, figures, equations and citations. Add a metric rail, an exhibit or a dedicated data page when the evidence calls for it. To use your own cover art, put a portrait image beside the report and set `folio-cover-image` in the manuscript metadata. The title, subtitle, byline and date stay editable and selectable.
 
-Read the same brief three ways. **Classic** uses a Garamond headline over Source Serif text. **Swiss** puts the byline in a left column and sets the body in IBM Plex Sans. **Monograph** centers its opening and uses Garamond, indented paragraphs and a quiet page number.
+The [authoring guide](docs/getting-started.md) covers page composition and LaTeX export. The [component reference](docs/components.md) includes working markup. Folio's [typography skill](skills/typography/SKILL.md) helps you check the exported pages at reading size.
 
-![Classic, Swiss and Monograph, left to right, each typesetting the same complete decision brief.](examples/typography-comparison.webp)
+Projects created with earlier Folio releases can still build from their own files.
 
-[All ten styles at reading size](examples/style-lookbook.pdf) · [Masthead gallery](examples/style-previews.webp)
+[Template source](src/folio_reports/templates/outlook/report.md) · [Development](DEVELOPMENT.md)
 
-```sh
-folio-reports styles
-folio-reports new research my-study --style gazette
-folio-reports build my-study --style blueprint -o blueprint-proof.pdf
-```
+## Rendered pages
 
-The preview uses the same manuscript and leaves the project's saved style intact. Save a choice in `folio.yaml`. Each generated project includes editable copies of all ten designs.
+The worked example evaluates a synthetic classifier under a fixed review budget. Open an image to inspect the page at full size, or [read the complete PDF](examples/outlook-report.pdf).
 
-Folio’s [typography skill](skills/typography/SKILL.md) helps you set a page or review a finished one. Use it to fit a table to its contents, compare type scales, or check what happened to the fonts, spacing and reading order in the exported PDF.
+| Illustrated cover | Two-column overview |
+| --- | --- |
+| [![Cover with a typeset title above a classifier decision boundary](examples/outlook-pages/page-1.webp)](examples/outlook-pages/page-1.webp) | [![Two columns of narrative above an operating recommendation](examples/outlook-pages/page-2.webp)](examples/outlook-pages/page-2.webp) |
 
-## Choose a component
+| Metric rail | Full-width exhibits |
+| --- | --- |
+| [![Precision, recall and review rate beside analysis and a full-width assignment table](examples/outlook-pages/page-3.webp)](examples/outlook-pages/page-3.webp) | [![A threshold sensitivity table and bar chart spanning both columns](examples/outlook-pages/page-4.webp)](examples/outlook-pages/page-4.webp) |
 
-Create a worked example with `folio-reports new specimen my-components`. Its Markdown shows how to write a decision callout, compare two options, and place a chart beside the exact estimates and bounds. In the appendix, three changes in evening visits share one axis, so readers can see which intervals cross zero. The chart and labels stay sharp at any zoom. [Component reference](docs/components.md) · [Editable specimen](src/folio_reports/templates/specimen/report.md)
-
-## Make it yours
-
-- Change the title, subtitle, authors and date at the top of `report.md`. The body accepts Markdown tables, math, footnotes, citations, local figures, and raw LaTeX.
-- Set margins, paper size and Pandoc options in `folio.yaml`. Edit the selected file in `styles/` for its title treatment and accent color, or `style.tex` for shared typography.
-- Give a designer editable LaTeX with `folio-reports build my-brief -o my-brief/manuscript.tex`. Keep figures beside the source when sharing it.
-- Build a generated project directly with `pandoc --defaults=folio.yaml report.md -o report.pdf` from its directory.
-
-[Authoring guide](docs/getting-started.md) · [Template sources](src/folio_reports/templates) · [Development](DEVELOPMENT.md)
+| Methods and notes | Diagnostic page |
+| --- | --- |
+| [![Two-column evaluation protocol with footnotes below the text](examples/outlook-pages/page-5.webp)](examples/outlook-pages/page-5.webp) | [![A navy diagnostic page with confidence intervals and recall by slice](examples/outlook-pages/page-6.webp)](examples/outlook-pages/page-6.webp) |

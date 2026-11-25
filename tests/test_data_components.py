@@ -21,7 +21,7 @@ def _plot(row: str, scale: str = 'min="-10" max="30" reference="0"') -> str:
 def test_interval_plot_maps_signed_values_and_preserves_precision(
     tmp_path: Path,
 ) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(_plot('low="-10" value="+2.00" high="30"'))
     tex = build(project, project / "proof.tex").read_text()
     assert r"\FolioRangeTitle{Change in R\&D}" in tex
@@ -33,7 +33,7 @@ def test_interval_plot_maps_signed_values_and_preserves_precision(
 
 
 def test_interval_plot_allows_ties_without_a_reference(tmp_path: Path) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         _plot('low="3" value="3" high="3"', 'min="1" max="5"')
     )
@@ -69,7 +69,7 @@ def test_interval_plot_allows_ties_without_a_reference(tmp_path: Path) -> None:
 def test_interval_plot_rejects_bad_inputs(
     tmp_path: Path, capfd: pytest.CaptureFixture[str], content: str, error: str
 ) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(content)
     with pytest.raises(subprocess.CalledProcessError):
         build(project, project / "proof.tex")
@@ -80,7 +80,7 @@ def test_interval_plot_rejects_bad_inputs(
 def test_sparse_trends_mark_individual_observations(
     tmp_path: Path, count: int, marked: bool
 ) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     values = ",".join(str(i) for i in range(count))
     (project / "report.md").write_text(
         f'::: {{.trend label="Visits" min="0" max="100" values="{values}" '
@@ -92,7 +92,7 @@ def test_sparse_trends_mark_individual_observations(
 
 
 def test_interval_plot_accepts_wide_finite_scales(tmp_path: Path) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         _plot('low="-1e308" value="0" high="1e308"', 'min="-1e308" max="1e308"')
     )
@@ -101,7 +101,7 @@ def test_interval_plot_accepts_wide_finite_scales(tmp_path: Path) -> None:
 
 
 def test_heatmap_final_cell_stops_at_the_table_rule(tmp_path: Path) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         '::::: {.heatmap label="Visits" columns="Mon|Tue" min="0" max="10"}\n'
         '::: {.row label="Week 1" values="0,10"}\n:::\n:::::\n'
@@ -114,7 +114,7 @@ def test_heatmap_final_cell_stops_at_the_table_rule(tmp_path: Path) -> None:
 def test_interval_plot_preserves_distinct_large_integer_coordinates(
     tmp_path: Path,
 ) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         _plot(
             'low="9007199254740992" value="9007199254740993" high="9007199254740994"',

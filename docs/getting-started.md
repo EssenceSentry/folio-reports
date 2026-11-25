@@ -2,73 +2,51 @@
 
 ## Create and render
 
-Install Pandoc, Tectonic, uv and Python 3.12 or newer. Install the Folio Reports CLI from GitHub, then start your own research report with its title and byline.
+Install Pandoc, Tectonic, uv and Python 3.12 or newer. Install Folio, then start a report with its title and byline.
 
 ```sh
 uv tool install git+https://github.com/EssenceSentry/folio-reports.git
-folio-reports new research transfer-study --title "Morning transfers: pilot results" --author "Service Planning"
-folio-reports build transfer-study
+folio-reports new model-review --title "Evaluation under a review budget" --author "Model Evaluation"
+folio-reports build model-review
 ```
 
-Open `transfer-study/report.md` and write below the closing `---`. The title and byline remain editable in the YAML at the top. Either `--title` or `--author` starts a clean manuscript and leaves out the example figures, data and bibliography. Use `--blank` on its own to start with “Untitled report”. All three layouts support these options and keep their styles and components.
+Write below the closing `---` in `model-review/report.md`. Either `--title` or `--author` starts a blank manuscript. Use `--blank` on its own for “Untitled report”. Create a project with just its directory name to start from the full model evaluation example.
 
-To explore a worked example, run `folio-reports new research transfer-example` and build that directory. The `brief` starter demonstrates a short decision memo and `specimen` showcases the component library.
+Both commands print their output path. The default PDF is `model-review/report.pdf`. Pass `-o path/to/report.pdf` to write a proof elsewhere. An explicit output path is relative to the shell's working directory. A failed build preserves the previous PDF.
 
-Both `new` and `build` print their output path. The default output is `transfer-study/report.pdf`. To publish a copy elsewhere, pass `-o path/to/finding.pdf`. An explicit output path is relative to the shell's working directory. A failed build keeps the previous PDF.
+## Compose the pages
 
-## Preview the same report in another style
+Use a top-level Markdown heading for a major section. Folio flows prose, lists and subheadings into two columns. Short introductory passages stay in one narrow column. Major headings, tables, figures and long display equations have the full text width. Put a table next to the passage that explains it and keep its caption close.
 
-Run `folio-reports styles` for the names and visual descriptions. Choose a default when you create a project, or pass a temporary choice when you build.
+Add a captioned figure with `![Caption](figure.pdf)`. Folio places captioned figures in the reading order. PDF suits vector plots. PNG and JPEG suit raster images. Put the images beside the manuscript or refer to them by a project-relative path.
+
+Use a `.keep-together` block for a short list and its lead-in. Use `.reading-columns` when composing the contents of a metric rail or a custom exhibit. You can put short, hand-set equations in that block. For a manuscript whose display math has been fitted to the columns, set `folio-column-math: true` in the YAML. Wrap any wider equation in `.full-width`.
+
+For an illustrated cover, put a portrait image beside `report.md` and set `folio-cover-image: cover.jpg`. Folio crops the image to the page and sets the title, subtitle, byline and date over it. Leave a quiet dark area behind the lettering. Use `folio-cover: true` for a plain separate title page. To add a contents page, set `table-of-contents: true` in `folio.yaml`.
+
+To cite a source, add its record to a BibTeX file, set `bibliography: references.bib` in the manuscript YAML, and cite it with `[@key]`. Folio also supports native Markdown footnotes. [Component reference](components.md)
+
+## Proof and hand off
+
+Read a prose page and an exhibit at actual size. Check where each heading, caption, and list lands when it runs close to the page edge. In tables, follow a value to its column and row labels. Choose relative column widths when labels wrap awkwardly. [Table measures](components.md#tables-and-their-notes)
+
+Folio uses EB Garamond for headings and Source Sans Pro for prose. Edit `layout.tex` to change the page geometry, palette or section styles. Edit `style.tex` for typography and captions. The accompanying template files travel with the project.
 
 ```sh
-folio-reports new research ridership --style ledger
-folio-reports build ridership --style gazette -o gazette-proof.pdf
+folio-reports build model-review -o model-review/manuscript.tex
 ```
 
-The saved choice is `metadata.folio-style` in `folio.yaml`. The files in `styles/` travel with your project and can be edited directly. The most recent style layer takes precedence over the shared typography. A project created with the first version of Folio still builds using its original files. To use the new styles in such a report, generate a fresh project and copy your manuscript, figures and bibliography into it. Bring across your own layout changes selectively.
+The exported TeX includes the preamble, body and formatted references. Keep images in the same relative locations when compiling it with Tectonic. A generated project can also build directly with `pandoc --defaults=folio.yaml report.md -o report.pdf` from its directory.
 
-For a separate title page, set `folio-cover: true` in the manuscript's YAML. Add `table-of-contents: true` to the top level of `folio.yaml` for navigation in a long report. The `specimen` starter uses a compact page for its component sheets. The other starters default to A4.
-
-## Write for your reader
-
-For a brief, lead with the action someone can authorize. Use the large number only when you can name what it counts, its denominator, and any assumption behind it. In a research report, put the first figure beside the finding it supports. Use the following sections for the population, method, and practical limits.
-
-Use the YAML at the top of `report.md` for the title, subtitle, author and date. Pandoc also accepts multiple authors. To cite a source, put its record in a BibTeX file, set `bibliography: references.bib` in the YAML, and use `[@key]` in the text. Add a captioned image with `![Caption](figure.pdf){width=90%}`. PDF works well for vector plots. PNG and JPEG suit raster images. Put your own figures beside the manuscript or refer to them by a project-relative path.
-
-For a short metric with a unit or percentage, use a fenced block. The text on the right supports ordinary Markdown emphasis and links.
-
-````markdown
-::: {.metric value="18"}
-**Potentially recoverable transfers** among 100 observed rider connections.
-:::
-````
-
-Use a top-level heading for each section. All three layouts paginate automatically. The research example uses a deliberate `\newpage` before its methods. Delete that line for continuous flow. For a longer study, add `table-of-contents: true` to `folio.yaml`. Set `papersize: letter` under `variables` for US Letter.
-
-## Proof the page at reading size
-
-Start with an interior page that contains two paragraphs, a heading and a table. Read a paragraph at actual size. If you lose your place on the return to the left edge, try a shorter line before increasing the type. Change one of the font, size, line spacing or measure at a time and compare the same paragraph in both proofs. [Butterick’s body-text guidance](https://practicaltypography.com/body-text.html).
-
-For tables, try following one number up to its column label, then reading across to its row label. Adjust the column widths until both are easy. Set an explanatory note within the same measure. The component guide shows how to control both widths from Markdown. [Tables and their notes](components.md#tables-and-their-notes).
-
-## Edit the design or hand off the source
-
-The starters share `style.tex` for body typography, table spacing, captions, and footers. `layout.tex` controls the accent, title and section styles. Both files are copied into each new report. The default pairs EB Garamond display type with Source Serif Pro for prose and Source Sans Pro for captions and tables. Swiss uses IBM Plex Sans. Monograph uses EB Garamond for continuous reading. The font files resolve from the TeX distribution.
-
-```sh
-folio-reports build transfer-study -o transfer-study/manuscript.tex
-```
-
-The exported TeX includes the preamble, body, and formatted references. Keep its images in the same relative locations when compiling it with Tectonic. The editable report directory can also be shared in full.
-
-The research example includes the four aggregate observations in `transfers.csv`. To regenerate its vector plot, run `uv run examples/redraw.py transfer-example` from the Folio checkout. It computes the 95% Wilson intervals from the counts. The 90-second threshold identifies visits where a hold might have helped. Estimating its effect requires a trial.
+Existing Folio projects continue to use their own settings. To adopt the current template, create a fresh project and copy in your manuscript, figures and bibliography.
 
 ## Call Folio from Python
 
 ```python
 from pathlib import Path
-from folio_reports import new, build
 
-project = new("brief", Path("service-review"), title="Review of the pilot")
+from folio_reports import build, new
+
+project = new(Path("model-review"), title="Evaluation under a review budget")
 pdf = build(project)
 ```

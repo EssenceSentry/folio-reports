@@ -44,7 +44,9 @@ Source: synthetic desk counts and illustrative staff notes. Every page uses the 
 
 # Reading the evening count
 
+::: {.prose}
 Of 200 visits, 80 began before 17:00, 48 between 17:00 and 18:00, and 72 after 18:00. Each full bar spans 100% of visits.
+:::
 
 ::: {.bar label="Before 17:00" value="40"}
 :::
@@ -63,7 +65,7 @@ Of 200 visits, 80 began before 17:00, 48 between 17:00 and 18:00, and 72 after 1
 ::: {.trend label="Evening visits per week" min="0" max="30" start="Week 1" end="Week 4" values="12,16,20,24"}
 :::
 
-::: {.table-layout widths="22,25,27,26" width="80%"}
+::: {.table-layout widths="22,25,27,26"}
 
 | **Week** | **All visits** | **Evening visits** | **Evening share** |
 |:-----|-----------:|---------------:|--------------:|
@@ -72,9 +74,6 @@ Of 200 visits, 80 began before 17:00, 48 between 17:00 and 18:00, and 72 after 1
 | 3    | 50         | 20             | 40%           |
 | 4    | 50         | 24             | 48%           |
 
-:::
-
-::: {.source}
 Evening arrivals doubled from 12 to 24 while total weekly visits held at 50. The appendix compares the weekly shares and their uncertainty.
 :::
 
@@ -159,27 +158,27 @@ Departure
 : Local time when that visit ends.
 
 Shift identifier
-: The date and scheduled closing time, retained for comparisons between days.
+: The date and scheduled closing time for comparing shifts.
 
 ::: {.pagebreak}
 :::
 
 # Handing the pilot to the evening team
 
-![Evening route through the East Room. One desk can see both the west entrance and the study tables. The diagram is illustrative.](east-room.pdf){width=90%}
+![Evening route through the East Room. One desk can see both the west entrance and the study tables. The diagram is illustrative.](east-room.pdf){width=100%}
 
 ::: {.pullquote by="Evening desk lead · illustrative interview"}
 The last readers tend to need a quiet place to finish, even after the returns desk has emptied.
 :::
 
 ::: {.action owner="Evening supervisor · Before the first shift"}
-Confirm the exit route, assign a relief contact, and post the two pilot evenings at the entrance.
+Confirm the exit route and name a relief contact. Post the pilot schedule at the entrance.
 :::
 
 ::: {.flow}
 1. **Open** the desk log.
 2. **Count** occupied seats at 19:00.
-3. **Close** the room and record paid time.
+3. **Close** the room. Log paid time.
 :::
 
 ::: {.check state="done"}
@@ -202,7 +201,9 @@ Pilot authorization and date
 
 # Counts behind the pilot
 
+::: {.prose}
 Tuesdays and Thursdays accounted for 39 of the 72 evening arrivals. Darker cells show higher counts on a shared scale of zero to eight.
+:::
 
 ::::: {.heatmap label="Evening arrivals by day" stub="Week" columns="Mon|Tue|Wed|Thu|Fri|Sat" min="0" max="8"}
 ::: {.row label="Week 1" values="1,3,1,3,2,2"}
@@ -226,11 +227,15 @@ Tuesdays and Thursdays accounted for 39 of the 72 evening arrivals. Darker cells
 :::
 :::::
 
-Week 4 reached 48%, up from 24% in week 1. The pointwise intervals compare independent groups of 50 visits each using the score method of @newcombe1998.
+::: {.prose}
+Week 4 reached 48%, up from 24% in week 1. The pointwise intervals use the score method [@newcombe1998] for independent groups of 50 visits.
+:::
 
 ## How long did a visit last?
 
 ::: {.distribution label="Visit duration in minutes" min="0" max="90" summary="4,12,23,38,76"}
 :::
 
-The middle half of visits lasted 12 to 38 minutes, with a median of 23. The whiskers mark the shortest and longest visits.
+::: {.prose}
+The middle half of visits lasted 12 to 38 minutes. The median was 23 minutes. Whiskers show the shortest and longest visits.
+:::

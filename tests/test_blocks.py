@@ -1,19 +1,22 @@
 import shutil
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
 
-from folio_reports.core import STYLES, build, new
+from folio_reports import build, new
 
 pytestmark = pytest.mark.skipif(
     shutil.which("pandoc") is None, reason="requires Pandoc"
 )
 
 
-@pytest.mark.parametrize("style", STYLES)
-def test_style_override_embeds_the_selected_design(tmp_path: Path, style: str) -> None:
-    project = new("specimen", tmp_path / "book", style="signal")
+@pytest.mark.parametrize("style", ["classic", "fieldnotes", "signal", "swiss"])
+def test_style_override_embeds_the_selected_design(
+    legacy_report: Callable[[str], Path], style: str
+) -> None:
+    project = legacy_report("specimen")
     original = (project / "folio.yaml").read_bytes()
     tex = build(project, project / "proof.tex", style=style).read_text()
     style_marker = (project / "styles" / f"{style}.tex").read_text().splitlines()[0]
@@ -22,6 +25,16 @@ def test_style_override_embeds_the_selected_design(tmp_path: Path, style: str) -
     assert r"\FolioTrend{Evening visits per week}" in tex
     assert r"\FolioHeatTitle{Evening arrivals by day}" in tex
     assert (project / "folio.yaml").read_bytes() == original
+
+
+def test_reference_labels_keep_their_original_link_targets(
+    legacy_report: Callable[[str], Path],
+) -> None:
+    project = legacy_report("specimen")
+    tex = " ".join(build(project, project / "proof.tex").read_text().split())
+    doi = "10.1080/01621459.1927.10502953"
+    assert rf"\href{{https://doi.org/{doi}}}{{DOI {doi}}}" in tex
+    assert r"\href{https://pubmed.ncbi.nlm.nih.gov/9595617/}{PubMed 9595617}" in tex
 
 
 @pytest.mark.parametrize(
@@ -48,7 +61,7 @@ def test_style_override_embeds_the_selected_design(tmp_path: Path, style: str) -
 def test_component_errors_identify_the_input(
     tmp_path: Path, markdown: str, message: str, capfd: pytest.CaptureFixture[str]
 ) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(markdown)
     with pytest.raises(subprocess.CalledProcessError):
         build(project, project / "report.tex")
@@ -56,7 +69,7 @@ def test_component_errors_identify_the_input(
 
 
 def test_author_metadata_and_cover_survive_style(tmp_path: Path) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         "---\ntitle: A handoff\nfolio-cover: true\n"
         "header-includes:\n  - '\\newcommand{\\AReader}{First}'\n"
@@ -70,11 +83,12 @@ def test_author_metadata_and_cover_survive_style(tmp_path: Path) -> None:
     assert r"R\&D at 50\%" in tex
 
 
-def test_new_cli_style_and_legacy_build(tmp_path: Path) -> None:
+def test_cli_can_preview_an_existing_project(
+    legacy_report: Callable[[str], Path], tmp_path: Path
+) -> None:
     from folio_reports.cli import main
 
-    project = tmp_path / "example"
-    assert main(["new", "brief", str(project), "--style", "gazette"]) == 0
+    project = legacy_report("brief")
     assert (
         main(
             [
@@ -96,7 +110,7 @@ def test_new_cli_style_and_legacy_build(tmp_path: Path) -> None:
 
 
 def test_table_layout_preserves_column_alignment_and_caption(tmp_path: Path) -> None:
-    project = new("research", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         '::: {.table-layout widths="1,3"}\n\n'
         "| Period | Visits |\n|:---|---:|\n| Morning | 16 |\n\n"
@@ -113,7 +127,7 @@ def test_table_layout_preserves_column_alignment_and_caption(tmp_path: Path) -> 
 
 @pytest.mark.parametrize("widths", ["0,2", "1", "1,nan", "1,2,3"])
 def test_table_layout_rejects_invalid_widths(tmp_path: Path, widths: str) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         f'::: {{.table-layout widths="{widths}"}}\n\n'
         "| A | B |\n|---|---:|\n| Morning | 16 |\n\n:::\n"
@@ -123,7 +137,7 @@ def test_table_layout_rejects_invalid_widths(tmp_path: Path, widths: str) -> Non
 
 
 def test_compact_table_keeps_note_with_selected_measure(tmp_path: Path) -> None:
-    project = new("research", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         '::: {.table-layout widths="1,2" width="75%"}\n\n'
         "| Period | Visits |\n|---|---:|\n| Morning | 16 |\n\n"
@@ -139,7 +153,7 @@ def test_compact_table_keeps_note_with_selected_measure(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("width", ["0%", "125%", "wide"])
 def test_invalid_table_measure(tmp_path: Path, width: str) -> None:
-    project = new("brief", tmp_path / "book")
+    project = new(tmp_path / "book")
     (project / "report.md").write_text(
         f'::: {{.table-layout widths="1,1" width="{width}"}}\n\n'
         "| A | B |\n|---|---:|\n| Morning | 16 |\n\n:::\n"

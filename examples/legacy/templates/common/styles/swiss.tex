@@ -8,16 +8,16 @@
 \renewcommand{\FolioMetricFace}{\FolioSwissDisplay}
 \renewcommand{\maketitle}{%
   {\color{FolioInk}\hrule height 1.1pt}\vspace{10pt}%
-  \noindent\begin{minipage}[t]{.235\linewidth}\vspace{0pt}%
+  \noindent\begin{minipage}[t]{.22\linewidth}\vspace{0pt}%
     \RaggedRight\sffamily\fontsize{9}{12}\selectfont
     {\bfseries\color{FolioAccent}\FolioKind\par}%
     \vspace{6pt}{\color{FolioMuted}\FolioAuthor\par\FolioDate\par}%
   \end{minipage}\hfill
-  \begin{minipage}[t]{.735\linewidth}\vspace{0pt}%
-    \FolioHeadline{\FolioSwissDisplay}{38.5}{39}\vspace{5pt}%
+  \begin{minipage}[t]{.745\linewidth}\vspace{0pt}%
+    \FolioHeadline{\FolioSwissDisplay}{36}{38}\vspace{\FolioSpaceSmall}%
     {\sffamily\fontsize{12}{15}\selectfont\FolioTitleRaggedRight\FolioSubtitle\par}
   \end{minipage}\par\vspace{12pt}}
 \titleformat{\section}{\sffamily\bfseries\fontsize{16}{19}\selectfont\color{FolioInk}}%
   {\textcolor{FolioAccent}{\thesection}}{.65em}{\raggedright}
-\titlespacing*{\section}{0pt}{15pt}{3pt}
+\titlespacing*{\section}{0pt}{\FolioSpaceSection}{5pt}
 \AtBeginDocument{\RaggedRight}

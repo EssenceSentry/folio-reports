@@ -2,9 +2,10 @@
 \definecolor{FolioAccent}{HTML}{496039}
 \definecolor{FolioInk}{HTML}{2C352A}
 \renewcommand{\maketitle}{%
-  {\color{FolioAccent}\FolioLabel{\FolioKind}\hfill\rule{.55\linewidth}{.5pt}}\par
-  \vspace{8pt}\begin{list}{}{\leftmargin=0pt\rightmargin=0pt}\item[]
+  {\color{FolioAccent}\FolioLabel{\FolioKind}\enspace
+    \leaders\hrule height .8ex depth -.72ex\hfill\kern0pt\par}%
+  \vspace{\FolioSpaceBlock}%
   \FolioHeadline{\FolioDisplay\itshape}{38}{38}\FolioDeck\FolioByline
-  \end{list}\vspace{2pt}}
+  \addvspace{\FolioSpaceSmall}}
 \FolioHeadings{\FolioDisplay\fontsize{21}{23}\selectfont}{FolioAccent}
 \fancyfoot[L]{\rmfamily\itshape\small\color{FolioMuted}\FolioKind}
