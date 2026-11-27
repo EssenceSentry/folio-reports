@@ -44,16 +44,34 @@
   \fi
   \vfill{\sffamily\small\FolioDate\par}%
   \endgroup\clearpage}
+% Stretch inside monospaced text: unbreakable between ordinary characters, breakable
+% after a separator.
+\newcommand{\FolioCodeGap}{\nobreak\hskip 0pt plus .35pt\relax}
+\newcommand{\FolioCodeBreak}{\hskip 0pt plus .35pt\relax}
+% A display equation must fit the line it is set on (the column, inside reading columns).
+\newsavebox{\FolioMathBox}
+\newcommand{\FolioCheckDisplayMath}[1]{%
+  \begingroup\sbox{\FolioMathBox}{$\displaystyle #1$}%
+  \ifdim\wd\FolioMathBox>\dimexpr\linewidth+.5pt\relax
+    \PackageError{Folio}{Display equation is \the\wd\FolioMathBox\space wide but its
+      column is \the\linewidth\space wide: \detokenize{#1}}{Break it over several lines
+      with aligned, move conditions into the text, or shorten it until it fits.}%
+  \fi\endgroup}
 \newlength{\FolioColumnGap}
-\setlength{\FolioColumnGap}{18pt}
+\setlength{\FolioColumnGap}{22pt}
 \newenvironment{FolioReadingColumns}{%
-  \setlength{\columnsep}{\FolioColumnGap}\setlength{\multicolsep}{6pt plus 2pt minus 1pt}%
+  \setlength{\columnsep}{\FolioColumnGap}\setlength{\multicolsep}{10pt plus 3pt minus 2pt}%
   \setlength{\maxbalancingoverflow}{0pt}%
-  \begin{multicols}{2}\raggedcolumns\RaggedRight
+  \begin{multicols}{2}\raggedcolumns
+  % A measure too narrow to justify well is set ragged.
+  \ifdim\linewidth<200pt \RaggedRight\fi
+  % No column or page may end on a paragraph's first line or start on its last.
+  \clubpenalty=10000 \widowpenalty=10000 \displaywidowpenalty=10000
 }{\end{multicols}}
 \newenvironment{FolioNarrowProse}{%
   \par\addvspace{\FolioSpaceSmall}\noindent
-  \begin{minipage}{\dimexpr(\linewidth-\FolioColumnGap)/2\relax}\RaggedRight
+  \begin{minipage}{\dimexpr(\linewidth-\FolioColumnGap)/2\relax}%
+  \setlength{\parskip}{7pt plus 1.5pt minus 1pt}%
 }{\end{minipage}\par\addvspace{\FolioSpaceSmall}}
 \newcommand{\FolioAnchorFigures}{%
   \renewenvironment{figure}[1][]{\par\noindent\begin{minipage}{\linewidth}%
@@ -73,7 +91,106 @@
   }{\par}
 }{\end{minipage}\par\addvspace{\FolioSpaceBlock}}
 \newcommand{\FolioRailNarrative}{%
-  \end{minipage}\hfill\begin{minipage}[t]{.71\linewidth}\vspace{0pt}}
+  \end{minipage}\hfill\begin{minipage}[t]{.71\linewidth}\vspace{0pt}\setlength{\parskip}{7pt plus 1.5pt minus 1pt}}
+% An exhibit or table is set whole and floated to the top of a page, so it is never cut
+% and the text runs on past it. One taller than a page stops the build.
+\newsavebox{\FolioWholeBox}
+\setcounter{topnumber}{2}\setcounter{totalnumber}{3}
+\renewcommand{\topfraction}{.92}\renewcommand{\textfraction}{.06}
+\renewcommand{\floatpagefraction}{.78}
+\setlength{\textfloatsep}{22pt plus 4pt minus 4pt}\setlength{\floatsep}{18pt plus 4pt minus 4pt}
+\makeatletter\setlength{\@fptop}{0pt}\setlength{\@fpsep}{22pt}\makeatother
+% Pandoc writes longtables. Inside the box each becomes a tabular: the repeating-head
+% marker is dropped, and a foot declared after the head is set at the end instead.
+\makeatletter
+\newif\ifFolio@foot
+\def\Folio@endhead{\@ifnextchar\bottomrule{\Folio@takefoot}{}}
+\def\Folio@takefoot\bottomrule#1\endlastfoot{\global\Folio@foottrue}
+\newcommand{\FolioLongtableAsTabular}{%
+  \let\endhead\Folio@endhead\let\endfirsthead\relax
+  \renewenvironment{longtable}[2][]{\global\Folio@footfalse\noindent\begin{tabular}{##2}}%
+    {\ifFolio@foot\bottomrule\fi\end{tabular}\par}}
+\makeatother
+% A list is not cut by a floated exhibit. Each pass records the pages every list starts
+% and ends on, and the page and height of every float. A list that ran across a page
+% break onto a float's page is kept whole from then on, so it moves past the float,
+% when it fits in the room that page has left; the decision is recorded, so the layout
+% settles. A list too tall for that is reported for the author to fix. (A page here has no stretch, so only a
+% forbidden break changes where the page ends; a merely discouraged one does not.)
+\makeatletter
+\newcounter{FolioListNo}
+\newcounter{FolioFloatNo}
+\newsavebox{\Folio@listbox}
+\newif\ifFolio@keep
+\newcount\Folio@q
+\newcount\Folio@cut
+\newdimen\Folio@room
+\newcommand{\FolioSeen}[3]{\expandafter\gdef\csname Folio@#1@#2\endcsname{#3}}
+% Page, height and number of a float; a page's entry keeps the total height and the
+% last float on it.
+\newcommand{\FolioFloatPage}[3]{%
+  \@ifundefined{Folio@fp@#1}{\expandafter\gdef\csname Folio@fp@#1\endcsname{#2}}%
+    {\expandafter\xdef\csname Folio@fp@#1\endcsname{%
+      \the\dimexpr\csname Folio@fp@#1\endcsname+#2\relax}}%
+  \expandafter\gdef\csname Folio@fpid@#1\endcsname{#3}}
+\newcommand{\FolioKept}[1]{\expandafter\gdef\csname Folio@keep@#1\endcsname{1}}
+\newcommand{\Folio@mark}[1]{%
+  \protected@write\@auxout{}{\string\FolioSeen{#1}{\theFolioListNo}{\thepage}}}
+% Sets \Folio@room to the least room on the float pages the list ran onto (or \maxdimen
+% when it ran onto none) and \Folio@cut to the first such page.
+\newcommand{\Folio@listcheck}{%
+  \Folio@room=\maxdimen \Folio@cut=0
+  \@ifundefined{Folio@Ls@\theFolioListNo}{}{\@ifundefined{Folio@Le@\theFolioListNo}{}{%
+    \Folio@q=\csname Folio@Ls@\theFolioListNo\endcsname\relax
+    \loop\ifnum\Folio@q<\csname Folio@Le@\theFolioListNo\endcsname\relax
+      \advance\Folio@q 1
+      \@ifundefined{Folio@fp@\the\Folio@q}{}{%
+        \ifnum\Folio@cut=0 \Folio@cut=\Folio@q \fi
+        \dimen@=\dimexpr\textheight-\csname Folio@fp@\the\Folio@q\endcsname
+          -\textfloatsep-4\baselineskip\relax
+        \ifdim\dimen@<\Folio@room \Folio@room=\dimen@ \fi}%
+    \repeat}}}
+\NewDocumentEnvironment{FolioList}{+b}{%
+  \par\stepcounter{FolioListNo}\Folio@keepfalse
+  \@ifundefined{Folio@keep@\theFolioListNo}{%
+    \Folio@listcheck
+    \ifdim\Folio@room<\maxdimen
+      \setbox\Folio@listbox\vbox{\hsize=\linewidth #1}%
+      \ifdim\dimexpr\ht\Folio@listbox+\dp\Folio@listbox\relax<\Folio@room
+        \Folio@keeptrue
+      \else
+        \PackageWarningNoLine{Folio}{A list is cut by floated exhibit
+          \csname Folio@fpid@\the\Folio@cut\endcsname\space (page \the\Folio@cut) and
+          is too tall to move past it. The list starts on page
+          \csname Folio@Ls@\theFolioListNo\endcsname\space and ends on page
+          \csname Folio@Le@\theFolioListNo\endcsname. Put a .pagebreak block after
+          that exhibit in the manuscript, or move the exhibit}%
+      \fi
+    \fi}{\Folio@keeptrue}%
+  \begingroup
+  \ifFolio@keep
+    \immediate\write\@auxout{\string\FolioKept{\theFolioListNo}}%
+    \interlinepenalty=\@M \clubpenalty=\@M \widowpenalty=\@M
+    \@itempenalty=\@M \@beginparpenalty=\@M
+    \let\Folio@par\par \def\par{\Folio@par\nobreak}%
+  \fi
+  \Folio@mark{Ls}#1\Folio@mark{Le}%
+  % The list is whole; what follows it may start a new column or page.
+  \ifFolio@keep\Folio@par\penalty\z@\fi
+  \endgroup}{}
+\NewDocumentEnvironment{FolioWhole}{+b}{%
+  \par\stepcounter{FolioFloatNo}%
+  \sbox{\FolioWholeBox}{\begin{minipage}{\textwidth}\FolioLongtableAsTabular #1\end{minipage}}%
+  \ifdim\dimexpr\ht\FolioWholeBox+\dp\FolioWholeBox\relax>.9\textheight
+    \PackageError{Folio}{An exhibit or table is \the\dimexpr\ht\FolioWholeBox+\dp\FolioWholeBox\relax
+      \space tall and does not fit on one page}{Shorten or split it, or add the class
+      .breakable to let it run over pages at its place in the text.}%
+  \fi
+  \begin{table*}[tp]%
+    \protected@write\@auxout{}{\string\FolioFloatPage{\thepage}%
+      {\the\dimexpr\ht\FolioWholeBox+\dp\FolioWholeBox\relax}{\theFolioFloatNo}}%
+    \noindent\usebox{\FolioWholeBox}\end{table*}}{}
+\makeatother
 \newenvironment{FolioExhibit}[3]{%
   \par\Needspace{6\baselineskip}\addvspace{\FolioSpaceSection}%
   {\color{FolioAccent}\FolioLabel{#1}\par}\nobreak\smallskip
@@ -114,7 +231,7 @@
   \setlength{\heavyrulewidth}{.55pt}\setlength{\lightrulewidth}{.3pt}%
   \setlength{\aboverulesep}{2pt}\setlength{\belowrulesep}{2pt}%
 }{\par\endgroup}
-\newenvironment{FolioTableNote}{\par\begingroup
+\newenvironment{FolioTableNote}{\par\addvspace{5pt}\begingroup
   \sffamily\footnotesize\color{FolioMuted}\RaggedRight\setlength{\parskip}{0pt}%
   \noindent\ignorespaces}{\par\endgroup}
 % Long callouts break with the page. A short label stays with its first line.

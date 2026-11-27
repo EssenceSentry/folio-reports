@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from folio_reports.core import build, new
+from folio_reports.core import build, layout_warnings, new
 
 
 def test_new_is_self_contained(tmp_path: Path) -> None:
@@ -42,10 +42,20 @@ def test_build_works_outside_report_directory(tmp_path: Path) -> None:
     project = tmp_path / "source files"
     new(project)
 
-    def render(args: list[str], *, cwd: Path, check: bool) -> None:
+    def render(
+        args: list[str], *, cwd: Path, check: bool, **_: object
+    ) -> subprocess.CompletedProcess[str]:
         assert cwd == project
-        assert check
-        Path(args[args.index("--output") + 1]).write_bytes(b"%PDF-example")
+        if args[0] == "pandoc":
+            assert check
+            Path(args[args.index("--output") + 1]).write_text("% LaTeX")
+        else:
+            outdir = Path(next(a for a in args if a.startswith("--outdir="))[9:])
+            (outdir / "review.pdf").write_bytes(b"%PDF-example")
+            (outdir / "review.log").write_text(
+                "Package Folio Warning: A list is cut by floated exhibit 2.\n\n"
+            )
+        return subprocess.CompletedProcess(args, 0, "", "")
 
     with patch("folio_reports.core.subprocess.run", side_effect=render):
         output = build(project, tmp_path / "outputs" / "review.pdf")
@@ -63,6 +73,7 @@ def test_blank_project_keeps_design_and_omits_example_content(tmp_path: Path) ->
     project = new(tmp_path / "draft", blank=True)
     resources = [
         "layout.tex",
+        "cover.jpg",
         "folio.yaml",
         "blocks.lua",
         "compose.lua",
@@ -79,6 +90,7 @@ def test_blank_project_keeps_design_and_omits_example_content(tmp_path: Path) ->
     )
     assert "Untitled report" in metadata
     assert "author:" not in metadata
+    assert "folio-cover-image: cover.jpg" in metadata
     assert not body.strip()
 
 
@@ -89,3 +101,43 @@ def test_empty_manuscript_metadata_leaves_no_project(
     with pytest.raises(ValueError, match="must contain"):
         new(tmp_path / "draft", title=title, author=author)
     assert not (tmp_path / "draft").exists()
+
+
+def test_engine_failure_is_reported_and_raised(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    project = new(tmp_path / "case")
+
+    def render(args: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+        if args[0] == "pandoc":
+            Path(args[args.index("--output") + 1]).write_text("% LaTeX")
+            return subprocess.CompletedProcess(args, 0, "", "")
+        return subprocess.CompletedProcess(args, 1, "", "! Display equation is wide")
+
+    with (
+        patch("folio_reports.core.subprocess.run", side_effect=render),
+        pytest.raises(subprocess.CalledProcessError),
+    ):
+        build(project)
+    assert "Display equation is wide" in capsys.readouterr().err
+
+
+def test_layout_warnings_name_each_fault_once() -> None:
+    log = (
+        "Underfull \\hbox (badness 10000) in paragraph at lines 3--9\n"
+        "[]\\TU/SourceSansPro-Regular.otf(0)/m/n/11 One large new flight\n\n"
+        "Underfull \\hbox (badness 10000) in paragraph at lines 3--9\n"
+        "[]\\TU/SourceSansPro-Regular.otf(0)/m/n/11 One large new flight\n\n"
+        "Overfull \\hbox (12.5pt too wide) in paragraph at lines 20--21\n"
+        "\\TU/lmtt/m/n/11 a_long_identifier\n\n"
+        "Overfull \\hbox (0.2pt too wide) in paragraph at lines 30--31\nfine\n\n"
+        "Overfull \\vbox (19.0pt too high) has occurred while \\output is active\n"
+        "Package Folio Warning: A list is cut by floated exhibit 3 (page 22) and is t\n"
+        "oo tall to move past it.\n\n"
+    )
+    assert layout_warnings(log) == [
+        "loose line (badness 10000); reword or shorten near: One large new flight",
+        "line 12.5pt too wide near: a_long_identifier",
+        "a column or page is 19.0pt too tall",
+        "A list is cut by floated exhibit 3 (page 22) and is too tall to move past it.",
+    ]

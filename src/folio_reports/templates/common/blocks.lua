@@ -295,6 +295,8 @@ end
 local handlers = {
   ["table-layout"]=table_layout,
   ["reading-columns"]=reading_columns,
+  ["folio-list"]=function(d) return environment("FolioList", {}, d.content) end,
+  whole=function(d) return environment("FolioWhole", {}, d.content) end,
   ["keep-together"]=function(d) return environment("samepage", {}, d.content) end,
   ["metric-rail"]=metric_rail,
   exhibit=function(d)
@@ -352,6 +354,47 @@ local function reference_link(link)
   elseif pmid then link.content = {text("PubMed"), pandoc.Space(), text(pmid)}
   else return end
   return {pandoc.LineBreak(), raw("\\hspace*{1.5em}"), link}
+end
+
+local code_escapes = {["\\"]="\\textbackslash{}", ["{"]="\\{", ["}"]="\\}", ["$"]="\\$",
+  ["&"]="\\&", ["#"]="\\#", ["^"]="\\^{}", ["_"]="\\_", ["%"]="\\%",
+  ["~"]="\\textasciitilde{}", ["'"]="\\textquotesingle{}", ["`"]="\\textasciigrave{}"}
+local code_breaks = {["/"]=true, ["_"]=true, ["-"]=true, ["."]=true}
+
+function Code(code)
+  -- Monospaced text has no stretch of its own, so a line that is mostly a path cannot be
+  -- justified. Each character carries a sliver of stretch, and a path or identifier may
+  -- break after a slash, underscore, hyphen or full stop.
+  local out = {}
+  for _, c in utf8.codes(code.text) do
+    local ch = utf8.char(c)
+    table.insert(out, code_escapes[ch] or ch)
+    table.insert(out, code_breaks[ch] and "\\FolioCodeBreak{}" or "\\FolioCodeGap{}")
+  end
+  return raw("\\texttt{" .. table.concat(out) .. "}")
+end
+
+function Str(str)
+  -- TeX does not hyphenate a word that already holds a hyphen. A zero-width space after
+  -- each hyphen between letters lets both halves of a compound break as usual.
+  if not str.text:find("%a%-%a") then return end
+  local out, rest = {}, str.text
+  while true do
+    local i = rest:find("%a%-%a")
+    if not i then break end
+    table.insert(out, pandoc.Str(rest:sub(1, i + 1)))
+    table.insert(out, raw("\\hskip 0pt{}"))
+    rest = rest:sub(i + 2)
+  end
+  table.insert(out, pandoc.Str(rest))
+  return out
+end
+
+function Math(math)
+  -- Measure each display equation against the line it is set on. An equation wider
+  -- than its column stops the build, so the author breaks or shortens it.
+  if math.mathtype ~= "DisplayMath" then return end
+  return {raw("\\FolioCheckDisplayMath{" .. math.text .. "}"), math}
 end
 
 function Header(header)
